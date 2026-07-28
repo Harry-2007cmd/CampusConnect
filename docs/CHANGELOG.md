@@ -2,7 +2,16 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-28 (repo structure + navigation library locked)
+
+- Reviewed a proposed MERN + Google Maps folder structure against the actual stack; confirmed it didn't match D-006/D-007 and wasn't adopted.
+- Designed and confirmed a FastAPI backend structure (`models/schemas/services/routers`) and a React Native mobile structure (feature-grouped `screens/`/`components/` by track, `services/` mirroring backend routers, `mocks/` for pre-integration development).
+- Chose **React Navigation** over Expo Router.
+- Logged as D-013. Flagged the two genuinely shared mobile files (`RootNavigator.jsx`, `AuthContext.jsx`) for merge coordination.
+- Added the structure to `TASKS.md` (new "Repo Structure" section) and populated `CLAUDE.md`'s previously-empty `## Conventions` section.
+
 ## 2026-07-28 (Carpool reactivated as primary hackathon feature)
+
 - User requested two hackathon features: Carpool (with price/place/gender filters) and Community Feed.
 - Flagged conflict with D-002 (Carpool was deferred to v2+ as high-risk, needing its own design pass) before proceeding — logged as D-012 rather than silently overridden.
 - Given the 3-day constraint, user chose Carpool as the fully-polished primary demo feature; Community Feed demoted to basic/functional.
@@ -12,16 +21,19 @@ All notable planning and product changes to CampusConnect. Newest first.
 - No code has been written yet.
 
 ## 2026-07-28 (hackathon scope cut)
+
 - Learned of a 3-day hackathon deadline with a published rubric (25 Problem clarity / 20 Product completeness / 30 UX quality / 25 Pitch & Demo, 100 pts total).
 - Re-scoped the build around the rubric. Logged D-011: refresh token rotation, OTP abuse-prevention edge cases, full profile fields, and moderation cut for the hackathon build only.
 
 ## 2026-07-28
+
 - Resolved both open decisions blocking Auth's API design. Logged D-006 (React Native + Expo) and D-007 (FastAPI).
 - Completed full design pass for Auth: DB schema, API, UX flow, edge cases, security review, complexity estimate.
 - Logged D-008 (OTP verification), D-009 (passwordless login), D-010 (access+refresh tokens).
 - Auth dev tasks written and ready for implementation.
 
 ## 2026-07-27
+
 - Initial project documentation created: `README.md`, `CLAUDE.md`, `DECISIONS.md`, `CHANGELOG.md`, `TASKS.md`.
 - Clarified scope: single university (for now), small team (2-4), mobile app (not website), Community Feed identified as the core hook.
 - Re-prioritized MVP to Auth → Profile → Community Feed; deferred Carpool, Search, Messaging, Notifications to v2+.

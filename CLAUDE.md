@@ -3,108 +3,77 @@
 Context for AI-assisted development on CampusConnect. Read this before writing any code.
 
 ## ⚠️ Hackathon mode active (2026-07-28 → 2026-07-31), team of 3
+
 This project has a 3-day hackathon deadline judged on a rubric (Problem clarity 25, Product completeness 20, UX quality 30, Pitch & Demo 25). Per D-011/D-012 in `DECISIONS.md`, **Carpool (with price/place/gender filters) is the primary, fully-polished demo feature. Community Feed is intentionally basic.** Auth and Profile are trimmed support scaffolding. Do not "fix" trimmed scope by adding back rotation, rate limiting, moderation, or extra fields unless explicitly asked. Do not remove the server-side gender-preference check on ride requests — that's a deliberate safety mechanism.
 
 **Three people are working in parallel on three branches** — `backend`, `mobile-carpool`, `mobile-core` — each running their own Claude Code session against this same `TASKS.md`. If you're running in one of these branches:
+
 - Only work the tasks assigned to your track in `TASKS.md`. Don't implement another track's tasks even if it seems faster — it'll conflict at merge time.
-- If you're on `mobile-carpool` or `mobile-core` and the backend endpoint you need isn't live yet, build against the request/response shape documented in the Track A task list and mock it, rather than blocking.
+- If you're on `mobile-carpool` or `mobile-core` and the backend endpoint you need isn't live yet, build against the request/response shape documented in the Track A task list and mock it (in `src/mocks/`), rather than blocking.
 - Flag in your task-completion summary which files you touched outside your obvious scope (e.g. shared navigation config, shared type definitions) so the human can coordinate a merge.
+- The repo structure (see `TASKS.md` and D-013) deliberately isolates `carpool/` and `feed/` folders per track. The two known shared files are `mobile/src/navigation/RootNavigator.jsx` and `mobile/src/context/AuthContext.jsx` — flag any edits to these in your team chat _before_ merging, not after.
 
 ## Project Summary
+
 CampusConnect is a mobile app for students at a single university. Long-term MVP = Auth + Profile + Community Feed. Current hackathon build also includes Carpool as the lead feature. See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
 
 ## Ground Rules
-- **Do not start implementation until planning is marked complete** in `TASKS.md` for the feature in question. **Suspended for the hackathon build** — see D-011/D-012.
-- **Documentation is the source of truth.** Before changing behavior, check `DECISIONS.md`. If a change contradicts a logged decision, flag it — don't silently override it.
-- Whenever a feature is added, modified, or removed: update the affected docs as part of the same change.
-- **No code has been written yet as of 2026-07-28.**
 
-## Tech Stack
-- **Client:** React Native + Expo (D-006).
-- **Backend:** Python, FastAPI, async-first. SQLAlchemy/SQLModel + Pydantic; Postgres (D-007).
-- **API style:** API-first, token-based auth. **Hackathon build:** single long-lived JWT, no refresh endpoint (D-011).
-- **Auth model:** Passwordless. Email OTP for verification and login (D-008, D-009). **Hackathon build:** no rate limiting, resend cooldown, or attempt lockout.
-- **Database:** relational, `university_id` on tenant-scoped tables, unused at MVP (D-004). `users.gender` added for Carpool's filter (D-012).
-
-## Conventions
-(To be populated once first code is written.)
-
-## Current Focus
-3-day hackathon build, 3-person team working in parallel branches (`backend`, `mobile-carpool`, `mobile-core`). See `TASKS.md` for the full Day 1/2/3 breakdown by track. **Carpool is the priority feature** — full polish, filters (price/place/gender) working end-to-end. Community Feed is basic/functional only.# CLAUDE.md
-
-Context for AI-assisted development on CampusConnect. Read this before writing any code.
-
-## ⚠️ Hackathon mode active (2026-07-28 → 2026-07-31)
-This project has a 3-day hackathon deadline judged on a rubric (Problem clarity 25, Product completeness 20, UX quality 30, Pitch & Demo 25). Per D-011/D-012 in `DECISIONS.md`, **Carpool (with price/place/gender filters) is the primary, fully-polished demo feature. Community Feed is intentionally basic.** Auth and Profile are trimmed support scaffolding. Do not "fix" trimmed scope by adding back rotation, rate limiting, moderation, or extra fields unless explicitly asked — that burns time the rubric doesn't reward. Follow `TASKS.md`'s Day 1/2/3 plan in order.
-
-**Note on Carpool specifically:** it was originally deferred in D-002 as high-risk (trust/safety/liability for coordinating physical transport between strangers) and only reactivated for this hackathon demo (D-012) with a trimmed design. Build exactly what's in `TASKS.md` — don't add scope beyond it, but also don't remove the server-side gender-preference enforcement on ride requests (task 13); that's a deliberate safety mechanism, not incidental complexity, and cutting it would defeat the point of the filter.
-
-## Project Summary
-CampusConnect is a mobile app for students at a single university. Long-term MVP = Auth + Profile + Community Feed. Current hackathon build also includes Carpool as the lead feature. See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
-
-## Ground Rules
 - **Do not start implementation until planning is marked complete** in `TASKS.md` for the feature in question. **Suspended for the hackathon build** — see D-011/D-012; all four features are being worked from deliberately trimmed specs.
 - **Documentation is the source of truth.** Before changing behavior, check `DECISIONS.md`. If a change contradicts a logged decision, flag it — don't silently override it.
 - Whenever a feature is added, modified, or removed: update the affected docs (`README.md`, `DECISIONS.md`, `CHANGELOG.md`, `TASKS.md`) as part of the same change.
 - **No code has been written yet as of 2026-07-28.**
 
 ## Tech Stack
-- **Client:** React Native + Expo (D-006).
+
+- **Client:** React Native + Expo (D-006), navigation via **React Navigation**, not Expo Router (D-013).
 - **Backend:** Python, FastAPI, async-first. SQLAlchemy/SQLModel + Pydantic; Postgres (D-007).
 - **API style:** API-first, token-based auth. **Hackathon build:** single long-lived JWT, no refresh endpoint (D-011).
 - **Auth model:** Passwordless. Email OTP for verification and login (D-008, D-009). **Hackathon build:** no rate limiting, resend cooldown, or attempt lockout.
-- **Database:** relational, `university_id` on tenant-scoped tables for future multi-university support, unused at MVP (D-004). `users.gender` added for Carpool's filter (D-012).
+- **Database:** relational, `university_id` on tenant-scoped tables, unused at MVP (D-004). `users.gender` added for Carpool's filter (D-012).
 
 ## Conventions
-(To be populated once first code is written.)
+
+**Backend (`backend/`) — layered FastAPI structure:**
+backend/
+├── app/
+│ ├── main.py
+│ ├── config.py
+│ ├── database.py
+│ ├── deps.py # get_db, get_current_user
+│ ├── core/
+│ │ ├── security.py # JWT encode/decode
+│ │ └── errors.py
+│ ├── models/ # SQLAlchemy/SQLModel tables
+│ ├── schemas/ # Pydantic request/response shapes
+│ ├── services/ # business logic (OTP gen, ride gender/seat checks) — keep this out of routers
+│ └── routers/ # thin — validate input, call services, return schema
+├── migrations/ # alembic
+├── scripts/seed.py
+└── tests/
+Rule of thumb: routers stay thin (parse request → call a service → return). Anything with an `if` statement checking business rules (gender match, seat availability, self-request) belongs in `services/`, not the router — this is where task 13's gender-preference check and seat-availability check live, and where a security reviewer should look first.
+
+**Mobile (`mobile/`) — React Navigation, feature-grouped:**
+mobile/
+├── src/
+│ ├── screens/
+│ │ ├── auth/ # Track C
+│ │ ├── profile/ # Track C
+│ │ ├── carpool/ # Track B
+│ │ └── feed/ # Track C
+│ ├── components/
+│ │ ├── common/ # shared: Button, Loader, EmptyState
+│ │ ├── carpool/
+│ │ └── feed/
+│ ├── navigation/RootNavigator.jsx # ⚠️ shared — see coordination note above
+│ ├── context/AuthContext.jsx # ⚠️ shared — see coordination note above
+│ ├── services/ # api.js + one file per resource, 1:1 with backend routers
+│ ├── mocks/ # mocked responses matching Track A's documented shapes
+│ └── hooks/
+`services/` files should mirror backend routers 1:1 (`rideService.js` ↔ `routers/rides.py`) so swapping a mock for a real call is a one-file change.
+
+See D-013 for the reasoning (parallel-branch merge-conflict avoidance) and why React Navigation was chosen over Expo Router.
 
 ## Current Focus
-3-day hackathon build. See `TASKS.md` for the Day 1 / Day 2 / Day 3 plan. **Carpool is the priority feature** — full polish, filters (price/place/gender) working end-to-end. Community Feed is basic/functional only. Auth and Profile are minimal scaffolding to support both.# CLAUDE.md
 
-Context for AI-assisted development on CampusConnect. Read this before writing any code.
-
-## Project Summary
-CampusConnect is a mobile app for students at a single university. MVP = Auth + Profile + Community Feed (Reddit-style). See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
-
-## Ground Rules
-- **Do not start implementation until planning is marked complete** in `TASKS.md` for the feature in question. Planning includes: DB schema, API design, UX flow, edge cases, and security review — not just a feature description.
-- **Documentation is the source of truth.** Before changing behavior, check `DECISIONS.md` for whether that behavior was an intentional decision. If a change contradicts a logged decision, flag it — don't silently override it.
-- Whenever a feature is added, modified, or removed: update the affected docs (`README.md`, `DECISIONS.md`, `CHANGELOG.md`, `TASKS.md`) as part of the same change, not as a follow-up.
-- **No code has been written yet as of 2026-07-28.** Auth is the first feature with a complete design and dev task breakdown (see `TASKS.md`) and is the intended starting point for implementation.
-
-## Tech Stack
-- **Client:** React Native + Expo (D-006).
-- **Backend:** Python, FastAPI, async-first. Likely SQLAlchemy/SQLModel + Pydantic; database engine assumed Postgres, pending confirmation during implementation (D-007).
-- **API style:** API-first, no server-rendered pages, token-based auth — access + refresh JWT pattern, not cookie/session-based (D-003, D-010).
-- **Auth model:** Passwordless. Email OTP for both verification and login, no password field anywhere (D-008, D-009).
-- **Database:** relational, schema designed to support future multi-university expansion via a `university_id` on tenant-scoped tables, even though only one university is live at MVP (D-004).
-
-## Conventions
-(To be populated once first code is written — naming conventions, folder structure, testing approach, etc.)
-
-## Current Focus
-Auth is fully designed (DB, API, UX, edge cases, security) and ready for implementation — see `TASKS.md` for the 13 dev tasks. Profile is the next feature to receive a design pass. Community Feed design has not started.# CLAUDE.md
-
-Context for AI-assisted development on CampusConnect. Read this before writing any code.
-
-## Project Summary
-CampusConnect is a mobile app for students at a single university. MVP = Auth + Profile + Community Feed (Reddit-style). See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
-
-## Ground Rules
-- **Do not start implementation until planning is marked complete** in `TASKS.md` for the feature in question. Planning includes: DB schema, API design, UX flow, edge cases, and security review — not just a feature description.
-- **Documentation is the source of truth.** Before changing behavior, check `DECISIONS.md` for whether that behavior was an intentional decision. If a change contradicts a logged decision, flag it — don't silently override it.
-- Whenever a feature is added, modified, or removed: update the affected docs (`README.md`, `DECISIONS.md`, `CHANGELOG.md`, `TASKS.md`) as part of the same change, not as a follow-up.
-
-## Tech Stack
-**Status: not yet finalized.** Known constraints so far:
-- Client: mobile app (not a website) — framework choice (React Native / Flutter / native) still open, needed before API contract design is finalized.
-- Backend: must be API-first (no server-rendered pages), token-based auth (not cookie/session-based, since mobile clients can't rely on browser cookies).
-- Database: relational, schema designed to support future multi-university expansion via a `university_id` on tenant-scoped tables, even though only one university is live at MVP.
-
-This section will be updated with concrete choices once made — see `DECISIONS.md`.
-
-## Conventions
-(To be populated once first code is written — naming conventions, folder structure, testing approach, etc.)
-
-## Current Focus
-Planning MVP: Auth, Profile, Community Feed. See `TASKS.md` for status.
+3-day hackathon build, 3-person team working in parallel branches (`backend`, `mobile-carpool`, `mobile-core`). See `TASKS.md` for the full Day 1/2/3 breakdown by track. **Carpool is the priority feature** — full polish, filters (price/place/gender) working end-to-end. Community Feed is basic/functional only.
