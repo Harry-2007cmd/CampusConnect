@@ -4,6 +4,14 @@ Architectural and product decisions, with rationale. Newest first.
 
 ---
 
+## D-014: Shared UI/UX design system locked before mobile screens are built
+
+**Date:** 2026-07-28
+**Decision:** Created `docs/DESIGN.md` — a lightweight, shared visual language for the hackathon build: color roles (primary/secondary/success/warning/error/text/background/surface/border), typography scale, a single spacing scale (4/8/12/16/24/32), corner-radius rules, and required loading/empty/error states for every async screen. Visual direction chosen: **warm & friendly** — rounded corners, approachable warm color palette, campus-community feel (not corporate/sterile).
+**Why:** Track B (`mobile-carpool`) and Track C (`mobile-core`) build screens in parallel, in separate branches, without seeing each other's code until merge. Without a shared baseline, colors/spacing/component style would diverge between Carpool and Feed/Auth/Profile screens, and the Day 3 UX polish pass (task 34) — which directly serves the largest rubric category, UX quality at 30/100 — would spend time reconciling inconsistency instead of refining. A small shared token set now is cheap; fixing visual drift on Day 3 is not.
+**Scope:** Deliberately minimal — color/type/spacing/radius/component-state baseline only. Full brand identity, icon set, illustration style, dark mode, and motion spec are explicitly out of scope and not blocking for the demo.
+**Status:** Applies to the hackathon build. Both mobile tracks (B and C) reference the same tokens; do not hardcode colors/spacing/radii per-screen.
+
 ## D-013: Repo folder structure + navigation library locked before Day 1 scaffolding
 
 **Date:** 2026-07-28
