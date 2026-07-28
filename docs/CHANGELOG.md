@@ -2,6 +2,16 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-28 (Carpool mobile scaffold + Browse/Detail screens — tasks 18-19)
+
+- First code in the repo. Scaffolded the `mobile/` Expo + React Navigation project (package.json, app.json, babel.config.js, App.jsx) since no mobile code existed yet — required to make tasks 18-19 runnable, not just isolated components.
+- Built `src/theme/tokens.js` implementing the D-014 color/spacing/typography/radius tokens verbatim from `docs/DESIGN.md`.
+- Built shared `components/common/` (`Button`, `Loader`, `EmptyState`) implementing the required loading/empty/error states from `DESIGN.md`, reused across Browse Rides and Ride Detail.
+- Built `components/carpool/` (`RideCard`, `FilterBar`, `GenderToggle`) and `screens/carpool/` (`BrowseRidesScreen`, `RideDetailScreen`).
+- Added `src/mocks/rides.mock.js` matching task 11/12's documented `GET /rides` / `GET /rides/:id` response shape, and `src/services/rideService.js` mirroring the future `routers/rides.py` 1:1 (mock-backed now, one-file swap when Track A's API is live).
+- Touched two files outside `carpool/` that are flagged shared with Track C: created `src/navigation/RootNavigator.jsx` (Carpool-only stack for now — confirmed with the user before writing) and left `context/AuthContext.jsx` untouched (screens don't need auth yet since they run on mocked data).
+- Added a root `.gitignore` (didn't exist) to exclude `node_modules/`, `.expo/`, `.env`.
+
 ## 2026-07-28 (shared UI/UX design system added)
 
 - Identified a gap: Day 1 planning covered screen inventory, component boundaries, and a Day 3 polish task, but no actual shared visual language (colors, spacing, typography, corner radius) existed — risk of Carpool and Feed/Auth/Profile screens visually diverging across the two parallel mobile branches.

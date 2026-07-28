@@ -111,8 +111,8 @@ Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md`
 
 ### Track B — Carpool Mobile (build against mocked API first)
 
-18. Browse Rides screen: filter bar (price range, origin/destination text, gender preference toggle), ride cards — use mocked ride list matching task 11's shape (from `src/mocks/rides.mock.js`)
-19. Ride Detail screen: full info + Request Seat button — mocked data first
+18. ✅ Browse Rides screen: filter bar (price range, origin/destination text, gender preference toggle), ride cards — use mocked ride list matching task 11's shape (from `src/mocks/rides.mock.js`)
+19. ✅ Ride Detail screen: full info + Request Seat button — mocked data first
 
 ### Track C — Core Mobile (build against mocked API first)
 

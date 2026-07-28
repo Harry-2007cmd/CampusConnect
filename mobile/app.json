@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "CampusConnect",
+    "slug": "campusconnect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#FFF8F3"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true },
+    "android": {},
+    "web": {}
+  }
+}
