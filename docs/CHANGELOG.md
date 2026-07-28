@@ -2,6 +2,18 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-28 (Track C: mobile scaffold + Auth/Profile screens, tasks 20-23)
+
+- Bootstrapped the `mobile/` Expo project (no code existed yet on `mobile-core` before this) per the D-013 structure: `package.json`, `app.json`, `babel.config.js`, `App.jsx`.
+- Added `src/theme/tokens.js` implementing the D-014 color/spacing/radius/typography tokens as importable constants.
+- Built shared `common/` components: `Button`, `Loader`, `EmptyState`, plus two not explicitly listed in D-013 but needed to apply D-014 consistently: `TextField` and `ChipToggle` (pill-style toggle, reusable by Track B's `GenderToggle`/filter chips).
+- Built Auth screens (task 20-21): `WelcomeScreen`, `EmailEntryScreen` (`.edu` validation), `OtpEntryScreen`.
+- Built `ProfileSetupScreen` (task 23): name, year, department, gender — gender options kept per D-012's Carpool filter requirement.
+- Built `context/AuthContext.jsx` (task 22, shared file): token storage via `expo-secure-store`, session restore on app start, OTP send/verify, profile save/logout.
+- Built `services/api.js` (axios + JWT interceptor) and `services/authService.js`, mirroring the documented `/auth` and `/profile` routers 1:1; currently backed by `mocks/auth.mock.js` (`USE_MOCKS = true`) since Track A's backend isn't live yet — flip one flag to swap in real calls (task 31).
+- Wired `navigation/RootNavigator.jsx` (shared file): unauthenticated → Auth stack, authenticated + incomplete profile → `ProfileSetup`, authenticated + complete profile → temporary `MainPlaceholderScreen` (to be replaced by Track B's Carpool entry point per task 33).
+- Not yet run/tested: no Node.js/npm available in this environment, so `npm install` and an Expo build were not verified. Needs a real device/simulator smoke test before Day 1 checkpoint.
+
 ## 2026-07-28 (shared UI/UX design system added)
 
 - Identified a gap: Day 1 planning covered screen inventory, component boundaries, and a Day 3 polish task, but no actual shared visual language (colors, spacing, typography, corner radius) existed — risk of Carpool and Feed/Auth/Profile screens visually diverging across the two parallel mobile branches.
