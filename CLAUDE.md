@@ -4,7 +4,7 @@ Context for AI-assisted development on CampusConnect. Read this before writing a
 
 ## ⚠️ Hackathon mode active (2026-07-28 → 2026-07-31), team of 3
 
-This project has a 3-day hackathon deadline judged on a rubric (Problem clarity 25, Product completeness 20, UX quality 30, Pitch & Demo 25). Per D-011/D-012 in `DECISIONS.md`, **Carpool (with price/place/gender filters) is the primary, fully-polished demo feature. Community Feed is intentionally basic.** Auth and Profile are trimmed support scaffolding. Do not "fix" trimmed scope by adding back rotation, rate limiting, moderation, or extra fields unless explicitly asked. Do not remove the server-side gender-preference check on ride requests — that's a deliberate safety mechanism.
+This project has a 3-day hackathon deadline judged on a rubric (Problem clarity 25, Product completeness 20, UX quality 30, Pitch & Demo 25). Per D-011/D-012 in `DECISIONS.md`, **Carpool (with price/place/gender filters) is the primary, fully-polished demo feature. Community Feed is intentionally basic.** Auth and Profile are trimmed support scaffolding. Do not "fix" trimmed scope by adding back rotation, rate limiting, moderation, or extra fields unless explicitly asked. Do not remove the server-side gender-preference check on ride requests — that's a deliberate safety mechanism. Before building any screen, read `docs/DESIGN.md` (D-014) — it's the shared color/spacing/typography/component baseline for both mobile tracks. Don't hardcode colors, spacing, or corner radii per-screen; use the tokens defined there.
 
 **Three people are working in parallel on three branches** — `backend`, `mobile-carpool`, `mobile-core` — each running their own Claude Code session against this same `TASKS.md`. If you're running in one of these branches:
 
@@ -31,6 +31,7 @@ CampusConnect is a mobile app for students at a single university. Long-term MVP
 - **API style:** API-first, token-based auth. **Hackathon build:** single long-lived JWT, no refresh endpoint (D-011).
 - **Auth model:** Passwordless. Email OTP for verification and login (D-008, D-009). **Hackathon build:** no rate limiting, resend cooldown, or attempt lockout.
 - **Database:** relational, `university_id` on tenant-scoped tables, unused at MVP (D-004). `users.gender` added for Carpool's filter (D-012).
+- **Design system:** shared color/spacing/typography/component tokens defined in `docs/DESIGN.md` (D-014) — "warm & friendly" direction, applies to both mobile tracks.
 
 ## Conventions
 
@@ -71,6 +72,8 @@ mobile/
 │ ├── mocks/ # mocked responses matching Track A's documented shapes
 │ └── hooks/
 `services/` files should mirror backend routers 1:1 (`rideService.js` ↔ `routers/rides.py`) so swapping a mock for a real call is a one-file change.
+
+All mobile screens/components pull colors, spacing, and corner radii from the tokens in `docs/DESIGN.md` (D-014) rather than hardcoding values — this applies equally to Track B (`carpool/`) and Track C (`auth/`, `profile/`, `feed/`) so the app doesn't visually fork between tracks.
 
 See D-013 for the reasoning (parallel-branch merge-conflict avoidance) and why React Navigation was chosen over Expo Router.
 

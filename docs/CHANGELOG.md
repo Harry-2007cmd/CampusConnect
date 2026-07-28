@@ -2,6 +2,15 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-28 (shared UI/UX design system added)
+
+- Identified a gap: Day 1 planning covered screen inventory, component boundaries, and a Day 3 polish task, but no actual shared visual language (colors, spacing, typography, corner radius) existed — risk of Carpool and Feed/Auth/Profile screens visually diverging across the two parallel mobile branches.
+- Created `docs/DESIGN.md`: color roles, typography scale, single spacing scale (4/8/12/16/24/32), corner-radius rules, and required loading/empty/error states for async screens.
+- Chose **warm & friendly** as the visual direction (rounded, approachable, campus-community feel) — user decision.
+- Logged as D-014 in `DECISIONS.md`.
+- Updated `CLAUDE.md` (hackathon banner + Tech Stack + Conventions) to reference `docs/DESIGN.md` as required reading before building any screen.
+- Updated `TASKS.md`: added task 17.5 (both mobile tracks confirm they've read the design tokens before starting screens 18-23), and a note on task 34 that Day 3 polish should be refinement, not retrofitting, since tokens are applied from Day 1.
+
 ## 2026-07-28 (repo structure + navigation library locked)
 
 - Reviewed a proposed MERN + Google Maps folder structure against the actual stack; confirmed it didn't match D-006/D-007 and wasn't adopted.

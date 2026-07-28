@@ -16,6 +16,7 @@ Implementation tasks for CampusConnect.
 
 - Branch off `main` at the start. Each person runs their own Claude Code session in their own branch/worktree, all pointed at this same `TASKS.md` and `CLAUDE.md`.
 - B and C build against the API contracts already specified below (endpoint + request/response shape) using mocked responses — don't wait idle for A to finish.
+- Both B and C build screens against the shared design tokens in `docs/DESIGN.md` (D-014) — confirm you've both read it before starting tasks 18-23, so Carpool and Feed/Auth/Profile don't visually diverge.
 - **Merge checkpoints:** end of Day 1 (backend API should be real and mergeable), midday Day 2 (swap mocks for real calls), end of Day 2 (everything integrated on `main`), Day 3 is `main`-only, no more branch work.
 - If two people touch the same file (e.g. navigation setup), whoever finishes first merges to `main` and the other rebases — flag it in your team chat before it happens, not after.
 
@@ -67,6 +68,7 @@ mobile/
 └── package.json
 
 Navigation library: **React Navigation** (not Expo Router) — see D-013.
+Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md` — D-014.
 
 ## Status Overview (hackathon build)
 
@@ -102,6 +104,10 @@ Navigation library: **React Navigation** (not Expo Router) — see D-013.
 17. Seed script: 10-15 realistic rides, varied price/route/gender_preference
 
 **Push API contracts (request/response shapes above) to the team chat as soon as each endpoint is done — B and C are coding against these live.**
+
+### Track B & C — shared, before screens
+
+17.5. Both mobile tracks read `docs/DESIGN.md` (D-014) and confirm the color/spacing/typography/component-state tokens before starting any screen in tasks 18-23. If either track wants to deviate, flag it in team chat first — don't fork the design silently.
 
 ### Track B — Carpool Mobile (build against mocked API first)
 
@@ -146,7 +152,7 @@ Navigation library: **React Navigation** (not Expo Router) — see D-013.
 
 ## Day 3 — All hands, `main` branch only
 
-34. Full UX pass on Carpool specifically (spacing, copy, empty states, loading states) — this is what judges will spend the most time on
+34. Full UX pass on Carpool specifically (spacing, copy, empty states, loading states) — this is what judges will spend the most time on. Should mostly be refinement, not retrofitting, since `docs/DESIGN.md` states/tokens were applied from Day 1.
 35. Light UX pass on Feed/Auth/Profile so nothing looks broken
 36. Replace ride seed data with final demo data — routes/prices/gender preferences that make filters obviously useful live
 37. Smoke-test full flow on a clean install, at least 2 of the 3 people testing on separate devices: signup → profile → browse/filter rides → request → (other account) accept → check My Rides both sides
@@ -162,6 +168,7 @@ Navigation library: **React Navigation** (not Expo Router) — see D-013.
 - Feed comments (unless time allows), moderation/report mechanism
 - Carpool: no in-app messaging, no payment handling, no background checks, no ride-in-progress tracking
 - Any multi-university logic (column exists, unused)
+- Full brand identity, icon set, illustration style, dark mode, motion spec (see D-014 scope note in `docs/DESIGN.md`)
 
 ## After the hackathon
 
