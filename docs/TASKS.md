@@ -1,89 +1,94 @@
 # TASKS.md
 
-Implementation tasks for CampusConnect. Per project rules, granular dev tasks for a feature are only added once that feature's full design (DB schema, API, UX, edge cases, security) is complete — not before.
+Implementation tasks for CampusConnect.
 
-## Status Overview
+**⚠️ Hackathon mode (2026-07-28 → deadline 2026-07-31, 3 days).** Rules relaxed per D-011/D-012. **Carpool is the primary, fully-polished demo feature. Community Feed is secondary/basic.** This reverses the earlier hackathon plan (which had Feed as primary) — see `DECISIONS.md` D-012 for why.
 
-| Feature | Product Scope | DB Design | API Design | UX Design | Edge Cases | Security Review | Dev Tasks |
-|---|---|---|---|---|---|---|---|
-| Auth | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Profile | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Community Feed | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Carpool | Deferred to v2 | — | — | — | — | — | — |
-| Search | Deferred to v2 | — | — | — | — | — | — |
-| Messaging | Deferred to v2 | — | — | — | — | — | — |
-| Notifications | Deferred to v2 | — | — | — | — | — | — |
+## Status Overview (hackathon build)
 
-## Open Decisions Blocking Design
-None currently. Mobile framework (React Native + Expo, D-006) and backend framework (FastAPI, D-007) were resolved 2026-07-28.
+| Feature | Scope for hackathon | Status |
+|---|---|---|
+| Auth | Trimmed: OTP login, single JWT, no rotation/rate-limiting | ⬜ Not started |
+| Profile | Trimmed: name, year, department, gender | ⬜ Not started |
+| Carpool | **Full polish — main demo.** Offer/browse/request rides, filter by price/place/gender | ⬜ Not started |
+| Community Feed | Basic: create post, list feed, upvote. Comments optional if time allows | ⬜ Not started |
 
-## Auth — Design Summary
-Full design complete 2026-07-28. Passwordless, OTP-based (D-008, D-009), access+refresh token pattern (D-010). See `DECISIONS.md` D-006 through D-010 for rationale.
+Full production designs for Auth (D-006–D-010), Profile, and Community Feed (with moderation, D-005) remain the post-hackathon target. Carpool's hackathon design (D-012) is explicitly not production-ready — real launch needs its own safety/liability review.
 
-### DB Schema
-```
-universities (id, name, email_domain UNIQUE, created_at)
-users (id, university_id FK, email UNIQUE, is_active, created_at, updated_at)
-otp_requests (id, email, university_id FK, code_hash, purpose, attempt_count,
-              max_attempts, expires_at, consumed_at, ip_address, created_at)
-refresh_tokens (id, user_id FK, token_hash, device_label, expires_at,
-                revoked_at, created_at)
-```
+---
 
-### API
-- `POST /auth/otp/request` `{email}` — validates .edu domain, rate-limited, sends OTP
-- `POST /auth/otp/verify` `{email, code}` — creates or fetches user, issues access + refresh tokens
-- `POST /auth/refresh` `{refresh_token}` — rotates refresh token, issues new access token
-- `POST /auth/logout` `{refresh_token}` — revokes token
-- `GET /auth/me` — protected, returns current user
+## Day 1 — Skeleton + trimmed Auth/Profile + Carpool backend
+Goal: a real person can log in, has a profile with gender set, and the Carpool API works end-to-end (testable via curl/Postman even before mobile UI exists).
 
-### Edge Cases Covered
-Unrecognized email domain; repeated OTP requests (rate limiting); wrong code / max attempts lockout; expired code; multi-device login; refresh token reuse detection (compromise signal → revoke all); reinstall/new device flow; university email reassignment (flagged as known limitation, not solved at MVP).
+**Backend — Auth & Profile**
+1. Repo scaffold: FastAPI project, Postgres connection, base migration setup
+2. Migration: `universities`, `users` (id, university_id, email, name, year, department, gender, created_at), `otp_requests` (id, email, code_hash, expires_at, consumed_at)
+3. Seed script: one university row + several realistic test student accounts (mixed gender for filter testing)
+4. `POST /auth/otp/request` — validate .edu domain, generate + email OTP
+5. `POST /auth/otp/verify` — check code, create-or-fetch user, issue single long-lived JWT
+6. `GET /auth/me`
+7. `PATCH /profile` — update name, year, department, gender
+8. `GET /profile/:id`
 
-### Security
-No password storage; OTP and refresh tokens hashed at rest; OTP rate-limited per email + IP; domain allowlist server-side only; consistent response shape to prevent user enumeration; HTTPS only; rotatable JWT signing secret.
+**Backend — Carpool**
+9. Migration: `rides` (id, driver_id, university_id, origin, destination, departure_time, price_per_seat, seats_total, seats_available, gender_preference, notes, status, created_at), `ride_requests` (id, ride_id, rider_id, status, created_at, unique on ride+rider)
+10. `POST /rides` — create ride offer
+11. `GET /rides?origin=&destination=&max_price=&gender_pref=` — filtered browse
+12. `GET /rides/:id`
+13. `POST /rides/:id/request` — request a seat (server-side gender check, seat-availability check, self-request check)
+14. `POST /rides/:id/requests/:reqId/accept` and `.../decline` — driver only
+15. `GET /rides/mine` — driving + riding tabs
+16. `POST /rides/:id/cancel`
+17. Seed script: 10-15 realistic rides with varied price/route/gender_preference for demo-quality filtering
 
-### Complexity Estimate
-Medium. Backend ~3–4 days, mobile ~2–3 days for one engineer each.
+**End of Day 1 checkpoint:** full Carpool API testable end-to-end via API client; Auth/Profile working enough to get a valid token.
 
-### Dev Tasks (ready for implementation — not yet started)
-**Backend**
-1. Migration: `universities`, `users`, `otp_requests`, `refresh_tokens` tables
-2. Seed script for the initial university record
-3. `POST /auth/otp/request` + email-sending service + rate limiting
-4. `POST /auth/otp/verify` (create-or-fetch user, issue tokens)
-5. `POST /auth/refresh` (rotation + reuse-detection)
-6. `POST /auth/logout`
-7. `GET /auth/me` + auth dependency/middleware
-8. Unit tests: expired code, max attempts, domain rejection, token rotation, reuse detection
+---
 
-**Mobile**
-9. Welcome + email-entry screen
-10. OTP-entry screen (resend cooldown, error states)
-11. Secure token storage + auth context
-12. Auto-refresh interceptor on 401
-13. Post-auth routing (new user → Profile setup, returning → Feed)
+## Day 2 — Carpool mobile UX (full polish) + basic Feed
+Goal: Carpool looks and feels like a real product. Feed exists and works but isn't the focus.
 
-## Next Up
-No code has been written yet for any feature. Auth is fully designed and its dev tasks (above) are ready to hand to an implementation tool once coding begins. Next **design** pass (not implementation): **Profile**, since Community Feed depends on it.# TASKS.md
+**Mobile — Auth/Profile**
+18. Welcome + email-entry screen
+19. OTP-entry screen
+20. Token storage + auth context
+21. Profile setup screen (name, year, department, gender)
 
-Implementation tasks for CampusConnect. Per project rules, granular dev tasks for a feature are only added once that feature's full design (DB schema, API, UX, edge cases, security) is complete — not before.
+**Mobile — Carpool (priority — spend the bulk of today here)**
+22. Browse Rides screen: filter bar (price range, origin/destination search, gender preference toggle), ride cards (route, time, price, seats left, driver name)
+23. Ride Detail screen: full info + Request Seat button (state-aware: disabled if full or gender-mismatched)
+24. Offer a Ride screen: origin, destination, time, price/seat, seats, gender preference
+25. My Rides screen: Driving tab (accept/decline requests) + Riding tab (my requests + status)
+26. Navigation between all Carpool screens, consistent with rest of app
 
-## Status Overview
+**Backend + Mobile — Feed (basic)**
+27. Migration: `posts` (id, user_id, university_id, title, body, category, upvote_count, created_at)
+28. `POST /posts`, `GET /posts`, `POST /posts/:id/upvote`
+29. Feed screen: list + create post + upvote. Comments skipped unless time remains.
+30. Seed script: real, specific posts (not placeholder text) across a few categories
 
-| Feature | Product Scope | DB Design | API Design | UX Design | Edge Cases | Security Review | Dev Tasks |
-|---|---|---|---|---|---|---|---|
-| Auth | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Profile | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Community Feed | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Carpool | Deferred to v2 | — | — | — | — | — | — |
-| Search | Deferred to v2 | — | — | — | — | — | — |
-| Messaging | Deferred to v2 | — | — | — | — | — | — |
-| Notifications | Deferred to v2 | — | — | — | — | — | — |
+**End of Day 2 checkpoint:** Carpool fully clickable end-to-end with filters working and looking polished. Feed works but is intentionally simple.
 
-## Open Decisions Blocking Design
-- Mobile framework (React Native / Flutter / native) — affects API contract shape, needed before API design for Auth.
-- Backend language/framework — not yet chosen.
+---
 
-## Next Up
-Full design pass (DB → API → UX → edge cases → security → complexity estimate) for **Auth**, since Profile and Community Feed both depend on it. No dev tasks will be written until that pass is complete and reflected in this file.
+## Day 3 — Polish, demo data, pitch
+Goal: score on UX quality (30 pts) and Pitch & Demo (25 pts).
+
+31. Full UX pass on Carpool specifically — this is what judges will spend the most time on. Fix spacing, copy, empty states, loading states.
+32. Light UX pass on Feed and Auth/Profile screens so nothing looks broken, without over-investing time here
+33. Replace/expand ride seed data with final "demo data" — routes, prices, and gender preferences that make the filters obviously useful in a live demo
+34. Smoke-test full flow on a clean install: signup → set profile → browse rides with filters → request a ride → (switch account) accept it → check My Rides on both sides
+35. Write and rehearse the 2-minute pitch — lead with the Carpool filter demo since it's the polished flow; problem framing should center on gender-safety and price transparency in student ride-sharing
+36. Reserve buffer time for last-minute breakage before presenting
+
+---
+
+## Explicitly not built for the hackathon (see D-011, D-012)
+- Refresh token rotation / reuse detection
+- OTP rate limiting, resend cooldown, attempt lockout
+- Feed comments (unless time allows), moderation/report mechanism
+- Carpool: no in-app messaging between driver/rider, no payment handling, no background checks, no ride-in-progress tracking
+- Any multi-university logic (column exists, unused)
+
+## After the hackathon
+Revert to full Auth design (D-008–D-010) and add Feed moderation (D-005) before any real launch. Carpool specifically needs a full trust/safety/liability review before real users coordinate real rides — see D-012's revert requirement.
