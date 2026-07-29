@@ -9,6 +9,9 @@
       "backgroundColor": "#FFF8F3"
     },
     "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true },
+    "android": {},
+    "web": {}
     "ios": {
       "supportsTablet": false
     },

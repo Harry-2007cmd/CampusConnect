@@ -22,6 +22,7 @@ CampusConnect is a mobile app for students at a single university. Long-term MVP
 - **Do not start implementation until planning is marked complete** in `TASKS.md` for the feature in question. **Suspended for the hackathon build** — see D-011/D-012; all four features are being worked from deliberately trimmed specs.
 - **Documentation is the source of truth.** Before changing behavior, check `DECISIONS.md`. If a change contradicts a logged decision, flag it — don't silently override it.
 - Whenever a feature is added, modified, or removed: update the affected docs (`README.md`, `DECISIONS.md`, `CHANGELOG.md`, `TASKS.md`) as part of the same change.
+- Carpool mobile scaffold (tasks 18-19, `mobile-carpool` branch) is the first code written, as of 2026-07-28.
 - **As of 2026-07-28, `mobile-core` has an initial `mobile/` scaffold + Auth/Profile screens (tasks 20-23); `backend` and `mobile-carpool` had not yet merged code as of this writing.** Check each branch before assuming "no code" project-wide.
 
 ## Tech Stack
