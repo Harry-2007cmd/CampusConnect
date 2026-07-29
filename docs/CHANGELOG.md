@@ -2,6 +2,17 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-29 (frontend ported from mobile app to web app — D-016)
+
+- Per user instruction, changed the frontend platform from a React Native + Expo mobile app to a browser-based web app, keeping all features and the user flow identical. Logged as D-016 (flags the reversal of D-003/D-006 rather than silently overriding them).
+- Added a new `web/` directory: Vite + React + `react-router-dom`. Ported every mobile screen, component, service, context, and hook 1:1:
+  - `screens/` — auth (Welcome/EmailEntry/OtpEntry), profile (ProfileSetup), carpool (BrowseRides/RideDetail/OfferRide/MyRides), feed (Feed).
+  - `components/` — common (Button/TextField/ChipToggle/Loader/EmptyState), carpool (FilterBar/GenderToggle/RideCard), feed (PostCard/UpvoteButton).
+  - `services/` (api/auth/post/ride — still 1:1 with backend routers), `context/AuthContext.jsx`, `hooks/` (useAuth/useRides), `theme/tokens.js` (D-014 tokens verbatim).
+- Platform-specific swaps: React Navigation → `react-router-dom` (auth gating reproduced in `web/src/App.jsx`); `expo-secure-store` → `localStorage`; RN primitives → HTML/CSS; `Alert.alert` → `window.alert`; `EXPO_PUBLIC_API_URL` → `VITE_API_URL`.
+- Backend untouched — it was already API-first/token-based (D-007), so the web client talks to the same `/auth`, `/profile`, `/rides`, `/posts` endpoints with no changes.
+- `mobile/` left in place as historical reference (see D-016 status note). Not verified at runtime here: Node/npm is not currently on this machine (the earlier PostgreSQL/Node note in the task-26 entry notwithstanding), so `npm install` + `vite build` in `web/` still needs to be run once on a machine with Node to confirm the port compiles and boots.
+
 ## 2026-07-29 (task 26 — cross-branch integration review + bug fixes)
 
 - Reviewed all of Day 1/1.5/Day 2 backend and mobile code against `TASKS.md`'s checked-off items to confirm the checkmarks reflect real, working code (they did) before resuming Day 2 work.

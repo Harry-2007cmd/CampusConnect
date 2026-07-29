@@ -4,6 +4,22 @@ Architectural and product decisions, with rationale. Newest first.
 
 ---
 
+## D-016: Frontend pivots from a mobile app to a web app (same features, same user flow)
+
+**Date:** 2026-07-29
+**Decision:** The client is now a **website** (browser-based React app) instead of a React Native + Expo mobile app. Built with Vite + React + `react-router-dom`, living in a new `web/` directory. Features, screens, user flow, API contracts, and the D-014 design system are all preserved verbatim — this is a platform/runtime port, not a product change.
+**What changed mechanically (mobile → web equivalents):**
+
+- React Navigation (native stack) → `react-router-dom` routes; the same auth-gated flow is reproduced in `web/src/App.jsx` (not-authenticated → Welcome/EmailEntry/OtpEntry; authenticated + incomplete profile → ProfileSetup; authenticated + complete profile → BrowseRides/RideDetail/OfferRide/MyRides/Feed).
+- `expo-secure-store` → `localStorage` for the JWT (`web/src/services/api.js`, `AuthContext.jsx`).
+- React Native primitives (`View`/`Text`/`Pressable`/`TextInput`/`FlatList`/`ScrollView`/`StyleSheet`/`ActivityIndicator`/`Alert`) → HTML elements + CSS. `Alert.alert` → `window.alert`.
+- `EXPO_PUBLIC_API_URL` → `VITE_API_URL`. The backend is unchanged and still API-first/token-based, so it serves the web client without modification.
+- `theme/tokens.js`, all `services/*` (still 1:1 with backend routers), `context/AuthContext.jsx`, and `hooks/*` are ported near-verbatim.
+
+**Flag against D-003 / D-006 / D-008:** This directly reverses **D-003** ("Platform is mobile app, not website") and retires **D-006** (React Native + Expo). Per `CLAUDE.md`'s standing rule, this is logged as a superseding decision rather than a silent override. D-003/D-006 stand as the historical record of why mobile was chosen (user requirement at the time); D-016 reflects the user's later instruction to move to the web. **D-008**'s rationale for OTP-over-magic-links cited Expo deep-linking specifically — the OTP decision still holds on its own merits (device/client-independent), but the Expo-specific part of its reasoning no longer applies.
+**Unchanged / still in force:** D-001 (email verification), D-004 (multi-tenant schema), D-007 (FastAPI backend), D-011/D-012 (hackathon scope + Carpool safety, incl. the server-side gender-preference check), D-014 (design system).
+**Status:** The `mobile/` directory is left in place as historical reference; `web/` is the active frontend. If mobile is not being resumed, `mobile/` can be removed in a later cleanup.
+
 ## D-015: Day 1 merge reconciliation — canonical shared mobile foundation + cross-track contract fixes
 
 **Date:** 2026-07-28

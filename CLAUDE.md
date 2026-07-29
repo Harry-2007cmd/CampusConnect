@@ -15,7 +15,7 @@ This project has a 3-day hackathon deadline judged on a rubric (Problem clarity 
 
 ## Project Summary
 
-CampusConnect is a mobile app for students at a single university. Long-term MVP = Auth + Profile + Community Feed. Current hackathon build also includes Carpool as the lead feature. See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
+CampusConnect is a web app for students at a single university (was a React Native + Expo mobile app until 2026-07-29 — see D-016; the same features and user flow, now browser-based in `web/`). Long-term MVP = Auth + Profile + Community Feed. Current hackathon build also includes Carpool as the lead feature. See `README.md` for full scope and `DECISIONS.md` for why things are the way they are.
 
 ## Ground Rules
 
@@ -27,7 +27,7 @@ CampusConnect is a mobile app for students at a single university. Long-term MVP
 
 ## Tech Stack
 
-- **Client:** React Native + Expo (D-006), navigation via **React Navigation**, not Expo Router (D-013).
+- **Client:** Web app — Vite + React, routing via **`react-router-dom`** (D-016). _(Was React Native + Expo with React Navigation until 2026-07-29 — D-006/D-013 — now retired; the original build remains in `mobile/` for reference.)_ JWT stored in `localStorage`; API base URL via `VITE_API_URL`.
 - **Backend:** Python, FastAPI, async-first. SQLAlchemy/SQLModel + Pydantic; Postgres (D-007).
 - **API style:** API-first, token-based auth. **Hackathon build:** single long-lived JWT, no refresh endpoint (D-011).
 - **Auth model:** Passwordless. Email OTP for verification and login (D-008, D-009). **Hackathon build:** no rate limiting, resend cooldown, or attempt lockout.
@@ -77,6 +77,8 @@ mobile/
 All mobile screens/components pull colors, spacing, and corner radii from the tokens in `docs/DESIGN.md` (D-014) rather than hardcoding values — this applies equally to Track B (`carpool/`) and Track C (`auth/`, `profile/`, `feed/`) so the app doesn't visually fork between tracks.
 
 See D-013 for the reasoning (parallel-branch merge-conflict avoidance) and why React Navigation was chosen over Expo Router.
+
+**Web (`web/`) — the active frontend (D-016):** mirrors the `mobile/` layout one-to-one — same `screens/` (auth/profile/carpool/feed), `components/` (common/carpool/feed), `services/` (still 1:1 with backend routers), `context/AuthContext.jsx`, `hooks/`, and `theme/tokens.js`. Differences are platform-only: `react-router-dom` in `web/src/App.jsx` replaces `RootNavigator.jsx` (same auth gating); `localStorage` replaces `expo-secure-store`; HTML/CSS replaces React Native primitives; `window.alert` replaces `Alert.alert`; `VITE_API_URL` replaces `EXPO_PUBLIC_API_URL`. Tokens are still applied from `theme/tokens.js` (D-014) — don't hardcode colors/spacing/radii per-screen. Run with `npm install` then `npm run dev` (Vite) from `web/`.
 
 ## Current Focus
 

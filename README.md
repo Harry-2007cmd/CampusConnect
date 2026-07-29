@@ -1,6 +1,6 @@
 # CampusConnect
 
-A mobile-first networking app for a single university, connecting students across years and departments.
+A web-based networking app for a single university, connecting students across years and departments.
 
 ## Status
 
@@ -12,7 +12,7 @@ CampusConnect helps students at one university discover and connect with each ot
 
 ## Scope (current — long-term product)
 
-- **Platform:** Mobile app (not a website). Backend will be API-first to support this.
+- **Platform:** Web app (browser-based). Backend is API-first and token-based, so it serves the web client directly. _(Was a mobile app until 2026-07-29 — see D-016; the original React Native + Expo build lives in `mobile/` for reference.)_
 - **Audience:** Students at a single university, for now. Schema will be designed to support multiple universities later without a rewrite, but multi-campus logic is explicitly out of scope for now.
 - **Team:** Small team (2-4 people).
 
@@ -54,7 +54,7 @@ This is a deliberate hackathon-only reprioritization (D-012), not a change to th
 - `CHANGELOG.md` — chronological log of what changed and when
 - `TASKS.md` — implementation task breakdown (currently the 3-day hackathon plan, Carpool-first)# CampusConnect
 
-A mobile-first networking app for a single university, connecting students across years and departments.
+A web-based networking app for a single university, connecting students across years and departments.
 
 ## Status
 
@@ -66,7 +66,7 @@ CampusConnect helps students at one university discover and connect with each ot
 
 ## Scope (current)
 
-- **Platform:** Mobile app (not a website). Backend will be API-first to support this.
+- **Platform:** Web app (browser-based). Backend is API-first and token-based, so it serves the web client directly. _(Was a mobile app until 2026-07-29 — see D-016; the original React Native + Expo build lives in `mobile/` for reference.)_
 - **Audience:** Students at a single university, for now. Schema will be designed to support multiple universities later without a rewrite, but multi-campus logic is explicitly out of scope for now.
 - **Team:** Small team (2-4 people).
 
