@@ -1,55 +1,25 @@
-import React from "react";
 import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { colors, spacing, radius, typography } from "../../theme/tokens";
 
-const VARIANT_STYLES = {
-  primary: {
-    background: colors.primary,
-    backgroundPressed: colors.primaryPressed,
-    border: "transparent",
-    text: colors.surface,
-  },
-  secondary: {
-    background: "transparent",
-    backgroundPressed: colors.background,
-    border: colors.secondary,
-    text: colors.secondary,
-  },
-  ghost: {
-    background: "transparent",
-    backgroundPressed: colors.background,
-    border: "transparent",
-    text: colors.textSecondary,
-  },
-};
-
-export default function Button({
-  label,
-  onPress,
-  variant = "primary",
-  disabled = false,
-  loading = false,
-}) {
-  const palette = VARIANT_STYLES[variant] ?? VARIANT_STYLES.primary;
+// variant: "primary" | "secondary" | "ghost"
+export default function Button({ title, onPress, variant = "primary", disabled = false, loading = false }) {
+  const isDisabled = disabled || loading;
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled || loading}
+      disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
-        {
-          backgroundColor: pressed ? palette.backgroundPressed : palette.background,
-          borderColor: palette.border,
-          borderWidth: palette.border === "transparent" ? 0 : 1,
-          opacity: disabled ? 0.5 : 1,
-        },
+        variantStyles[variant],
+        pressed && !isDisabled && variant === "primary" && { backgroundColor: colors.primaryPressed },
+        isDisabled && styles.disabled,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={palette.text} />
+        <ActivityIndicator color={variant === "primary" ? colors.surface : colors.primary} />
       ) : (
-        <Text style={[styles.label, { color: palette.text }]}>{label}</Text>
+        <Text style={[styles.label, textVariantStyles[variant]]}>{title}</Text>
       )}
     </Pressable>
   );
@@ -59,12 +29,27 @@ const styles = StyleSheet.create({
   base: {
     minHeight: 44,
     borderRadius: radius.button,
-    paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: spacing.lg,
   },
   label: {
-    fontSize: typography.size.body,
+    fontSize: typography.body,
     fontWeight: typography.weight.semibold,
   },
+  disabled: {
+    opacity: 0.5,
+  },
+});
+
+const variantStyles = StyleSheet.create({
+  primary: { backgroundColor: colors.primary },
+  secondary: { backgroundColor: "transparent", borderWidth: 1, borderColor: colors.secondary },
+  ghost: { backgroundColor: "transparent" },
+});
+
+const textVariantStyles = StyleSheet.create({
+  primary: { color: colors.surface },
+  secondary: { color: colors.secondary },
+  ghost: { color: colors.textSecondary },
 });

@@ -1,4 +1,4 @@
-// Shared design tokens — see docs/DESIGN.md (D-014). Do not hardcode colors/spacing/radii per-screen.
+// Shared design tokens — docs/DESIGN.md (D-014). Do not hardcode colors/spacing/radii in screens.
 
 export const colors = {
   primary: "#FF7A59",
@@ -30,13 +30,11 @@ export const radius = {
 };
 
 export const typography = {
-  size: {
-    caption: 12,
-    bodySmall: 14,
-    body: 16,
-    subheading: 20,
-    title: 24,
-  },
+  caption: 12,
+  bodySmall: 14,
+  body: 16,
+  subheading: 20,
+  title: 24,
   weight: {
     regular: "400",
     semibold: "600",

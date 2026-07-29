@@ -1,12 +1,10 @@
-import React from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
-import { colors, spacing, typography } from "../../theme/tokens";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { colors } from "../../theme/tokens";
 
-export default function Loader({ label = "Loading..." }) {
+export default function Loader() {
   return (
     <View style={styles.container}>
-      <ActivityIndicator color={colors.primary} size="large" />
-      <Text style={styles.label}>{label}</Text>
+      <ActivityIndicator size="large" color={colors.primary} />
     </View>
   );
 }
@@ -16,12 +14,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: spacing.xl,
-    gap: spacing.sm,
-  },
-  label: {
-    color: colors.textSecondary,
-    fontSize: typography.size.bodySmall,
-    marginTop: spacing.sm,
+    backgroundColor: colors.background,
   },
 });

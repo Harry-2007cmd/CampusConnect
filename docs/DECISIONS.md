@@ -4,19 +4,41 @@ Architectural and product decisions, with rationale. Newest first.
 
 ---
 
+## D-015: Day 1 merge reconciliation — canonical shared mobile foundation + cross-track contract fixes
+
+**Date:** 2026-07-28
+**Context:** Day 1 review of all three branches (`backend`, `mobile-carpool`, `mobile-core`) found that both mobile tracks independently scaffolded the same "no code exists yet" starting point (`App.jsx`, `RootNavigator.jsx`, `package.json`, `app.json`, `theme/tokens.js`, `components/common/{Button,Loader,EmptyState}.jsx`) rather than just the two files D-013 explicitly flagged as shared (`RootNavigator.jsx`, `AuthContext.jsx`). Several of these diverged in incompatible ways.
+
+**Decision — canonical versions / fixes to apply before Day 2 tasks 27-33:**
+
+1. **`theme/tokens.js`:** keep the flat `typography` keys (`typography.body`, `typography.title`, ...) as canonical since more screens already consume that shape, but add a nested `typography.size` object mirroring the same values, so `mobile-carpool`'s existing components (which use `typography.size.body`) keep working without edits. `colors`, `spacing`, and `radius` already matched across both branches — no change needed there.
+2. **`components/common/Button.jsx`:** canonical implementation accepts both a `title` and a `label` prop (`const text = title ?? label`) so neither track's call sites need to change.
+3. **`components/common/Loader.jsx`:** adopt `mobile-carpool`'s version (accepts an optional `label` under the spinner) — it's a strict superset of `mobile-core`'s no-prop version, so `mobile-core`'s call sites are unaffected.
+4. **`components/common/EmptyState.jsx`:** adopt `mobile-carpool`'s version (accepts an optional `tone` prop for error-vs-neutral coloring) for the same reason — superset, backward compatible.
+5. **`App.jsx` / `navigation/RootNavigator.jsx`:** these cannot be mechanically merged — they represent different halves of the same app. Canonical `App.jsx` keeps `mobile-core`'s wrapper (`SafeAreaProvider` + `AuthProvider`). Canonical `RootNavigator.jsx` combines `mobile-core`'s Auth/Profile stack with `mobile-carpool`'s Carpool stack, and implements task 33's post-auth routing: authenticated + incomplete profile → `ProfileSetup`; authenticated + complete profile → Carpool `BrowseRides` (replacing the temporary `MainPlaceholderScreen`).
+6. **`package.json` / `app.json`:** take the union of dependencies (keep `expo-secure-store`, `axios`, both `@react-navigation` packages) and the more complete `app.json` (`ios.supportsTablet`, `android.adaptiveIcon`).
+7. **Cross-track data-contract fixes** (found because each track mocked the other side of the same contract independently, and nobody diffed the two mocks against the real backend schema):
+   - Mobile Profile screen's `GENDER_OPTIONS` must send `value: "male" | "female" | "other"` (matching backend `GenderEnum`) instead of `"woman"/"man"/"other"` — display labels can stay friendly, only the underlying value changes. Without this fix, `PATCH /profile` will 422 the moment task 31 swaps the mock for the real call.
+   - `rideService.js`'s real-API branch must omit `gender_pref` entirely when the filter is set to `"any"`, instead of sending `gender_pref=any` literally — the backend treats `any` as a literal filter value (only rides with no preference), not as "no filter," so sending it would hide every gender-restricted ride once task 27 wires up the real endpoint.
+   - `mocks/rides.mock.js`'s `status` values should use the backend's real `RideStatusEnum` (`"active"`, not `"open"`) so nothing built against the mock silently breaks when task 27 swaps in real data.
+8. **Process note:** the `backend` branch completed tasks 1-17 without updating `CHANGELOG.md`/`TASKS.md`, contrary to `CLAUDE.md`'s standing rule that doc updates land with the same change. Retroactively logged in `CHANGELOG.md`. Going forward, doc updates are part of "done," not a follow-up step, even under hackathon time pressure.
+
+**Why:** None of the above requires re-architecting anything — they're small, mechanical fixes. But left unresolved, whichever branch merges to `main` second silently breaks the other track's screens (crashed Carpool screens if the merged tokens file has no `.size` object; blank button labels; a 422 the first time a real profile save happens). Catching this now, before Day 2's integration work starts, is far cheaper than debugging it live during the Day 2 merge checkpoint.
+**Status:** Applies to the hackathon build. Do this first on Day 2, before tasks 27-33 — see `TASKS.md` "Day 1.5" section.
+
 ## D-014: Shared UI/UX design system locked before mobile screens are built
 
 **Date:** 2026-07-28
 **Decision:** Created `docs/DESIGN.md` — a lightweight, shared visual language for the hackathon build: color roles (primary/secondary/success/warning/error/text/background/surface/border), typography scale, a single spacing scale (4/8/12/16/24/32), corner-radius rules, and required loading/empty/error states for every async screen. Visual direction chosen: **warm & friendly** — rounded corners, approachable warm color palette, campus-community feel (not corporate/sterile).
 **Why:** Track B (`mobile-carpool`) and Track C (`mobile-core`) build screens in parallel, in separate branches, without seeing each other's code until merge. Without a shared baseline, colors/spacing/component style would diverge between Carpool and Feed/Auth/Profile screens, and the Day 3 UX polish pass (task 34) — which directly serves the largest rubric category, UX quality at 30/100 — would spend time reconciling inconsistency instead of refining. A small shared token set now is cheap; fixing visual drift on Day 3 is not.
 **Scope:** Deliberately minimal — color/type/spacing/radius/component-state baseline only. Full brand identity, icon set, illustration style, dark mode, and motion spec are explicitly out of scope and not blocking for the demo.
-**Status:** Applies to the hackathon build. Both mobile tracks (B and C) reference the same tokens; do not hardcode colors/spacing/radii per-screen.
+**Status:** Applies to the hackathon build. Both mobile tracks (B and C) reference the same tokens; do not hardcode colors/spacing/radii per-screen. **See D-015: the values were followed correctly, but the exported object shape for `typography` wasn't specified precisely enough and diverged between tracks anyway — worth remembering for any future shared spec.**
 
 ## D-013: Repo folder structure + navigation library locked before Day 1 scaffolding
 
 **Date:** 2026-07-28
 **Decision:** Backend (`backend/`) uses a standard FastAPI layered layout (`models/` / `schemas/` / `services/` / `routers/`), with `services/` holding business logic (OTP generation, ride gender/seat checks) out of the router layer. Mobile (`mobile/`) uses **React Navigation** (not Expo Router) with a `services/` layer that maps 1:1 to backend routers, and a `mocks/` folder so Tracks B/C can build against mocked API shapes before Track A's endpoints are live (per the Day 1 workflow already in `TASKS.md`).
-**Why:** Three people are working in parallel on separate branches (`backend`, `mobile-carpool`, `mobile-core`). The main risk isn't feature scope, it's merge conflicts on shared files. A structure where `carpool/` and `feed/` components, screens, and services are fully isolated per track means B and C almost never touch the same file. The exceptions — `navigation/RootNavigator.jsx` and `context/AuthContext.jsx` — are explicitly flagged as shared, consistent with `CLAUDE.md`'s existing "whoever finishes first merges, other rebases" rule.
+**Why:** Three people are working in parallel on separate branches (`backend`, `mobile-carpool`, `mobile-core`). The main risk isn't feature scope, it's merge conflicts on shared files. A structure where `carpool/` and `feed/` components, screens, and services are fully isolated per track means B and C almost never touch the same file. The exceptions — `navigation/RootNavigator.jsx` and `context/AuthContext.jsx` — are explicitly flagged as shared, consistent with `CLAUDE.md`'s existing "whoever finishes first merges, other rebases" rule. **See D-015: in practice, both tracks also independently rebuilt the surrounding scaffold (App.jsx, package.json, tokens, common components) since both started from an empty repo — worth flagging as shared/first-come-first-served next time a fully greenfield parallel build happens.**
 **Why React Navigation over Expo Router:** explicit user choice.
 **Status:** Applies to the hackathon build; can be revisited post-hackathon if the team wants file-based routing at that point.
 

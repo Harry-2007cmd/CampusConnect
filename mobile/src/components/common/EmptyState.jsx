@@ -1,26 +1,16 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { colors, spacing, typography } from "../../theme/tokens";
 import Button from "./Button";
+import { colors, spacing, typography } from "../../theme/tokens";
 
-// Reused for both the "no results" empty state and the "request failed" error state
-// (DESIGN.md requires both on every async screen) — `tone` swaps the copy color only.
-export default function EmptyState({
-  title,
-  message,
-  tone = "neutral",
-  actionLabel,
-  onAction,
-}) {
-  const titleColor = tone === "error" ? colors.error : colors.textPrimary;
-
+// Friendly, specific empty/error copy — see docs/DESIGN.md "Required States".
+export default function EmptyState({ title, message, actionLabel, onAction }) {
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+      <Text style={styles.title}>{title}</Text>
       {message ? <Text style={styles.message}>{message}</Text> : null}
       {actionLabel && onAction ? (
         <View style={styles.action}>
-          <Button label={actionLabel} onPress={onAction} variant="secondary" />
+          <Button title={actionLabel} onPress={onAction} variant="secondary" />
         </View>
       ) : null}
     </View>
@@ -32,21 +22,22 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xl,
-    gap: spacing.sm,
+    padding: spacing.xl,
+    backgroundColor: colors.background,
   },
   title: {
-    fontSize: typography.size.subheading,
+    fontSize: typography.subheading,
     fontWeight: typography.weight.semibold,
+    color: colors.textPrimary,
     textAlign: "center",
+    marginBottom: spacing.sm,
   },
   message: {
-    fontSize: typography.size.bodySmall,
+    fontSize: typography.body,
     color: colors.textSecondary,
     textAlign: "center",
   },
   action: {
-    marginTop: spacing.md,
+    marginTop: spacing.lg,
   },
 });

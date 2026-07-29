@@ -12,5 +12,13 @@
     "ios": { "supportsTablet": true },
     "android": {},
     "web": {}
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF8F3"
+      }
+    }
   }
 }

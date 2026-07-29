@@ -1,38 +1,41 @@
-import React from "react";
+// ⚠️ Shared file (see CLAUDE.md / D-013) — flag non-trivial changes before merging
+// to `main` so Track B (mobile-carpool) can coordinate. Track B's Carpool stack/tabs
+// will be added here once merged; this file currently only wires up Auth/Profile
+// (Track C scope) plus a temporary post-auth placeholder.
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { colors, typography } from "../theme/tokens";
-import BrowseRidesScreen from "../screens/carpool/BrowseRidesScreen";
-import RideDetailScreen from "../screens/carpool/RideDetailScreen";
+import WelcomeScreen from "../screens/auth/WelcomeScreen";
+import EmailEntryScreen from "../screens/auth/EmailEntryScreen";
+import OtpEntryScreen from "../screens/auth/OtpEntryScreen";
+import ProfileSetupScreen from "../screens/profile/ProfileSetupScreen";
+import MainPlaceholderScreen from "../screens/MainPlaceholderScreen";
+import Loader from "../components/common/Loader";
+import { useAuth } from "../hooks/useAuth";
 
-// ⚠️ Shared with Track C (mobile-core) — see CLAUDE.md coordination note.
-// Only the Carpool stack exists so far (Track B, tasks 18-19). Track C:
-// add Auth/Profile/Feed stacks and the post-auth routing switch (task 33)
-// here — flag before merging per the shared-file rule.
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
+  const { isLoading, isAuthenticated, isProfileComplete } = useAuth();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="BrowseRides"
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.textPrimary,
-          headerTitleStyle: { fontWeight: typography.weight.semibold },
-          headerShadowVisible: false,
-        }}
-      >
-        <Stack.Screen
-          name="BrowseRides"
-          component={BrowseRidesScreen}
-          options={{ title: "Find a Ride" }}
-        />
-        <Stack.Screen
-          name="RideDetail"
-          component={RideDetailScreen}
-          options={{ title: "Ride Details" }}
-        />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!isAuthenticated ? (
+          <Stack.Group>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="EmailEntry" component={EmailEntryScreen} />
+            <Stack.Screen name="OtpEntry" component={OtpEntryScreen} />
+          </Stack.Group>
+        ) : !isProfileComplete ? (
+          <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+        ) : (
+          <Stack.Screen name="Main" component={MainPlaceholderScreen} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,10 +1,19 @@
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 
-// No auth interceptor yet — AuthContext.jsx (Track C) isn't wired up. Add the
-// JWT bearer interceptor here once real endpoints are live and auth exists.
-const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000",
-  timeout: 10000,
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+const TOKEN_KEY = "campusconnect_token";
+
+export const api = axios.create({
+  baseURL: API_URL,
 });
 
-export default api;
+api.interceptors.request.use(async (config) => {
+  const token = await SecureStore.getItemAsync(TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export { TOKEN_KEY };

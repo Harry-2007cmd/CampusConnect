@@ -1,5 +1,8 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AuthProvider } from "./src/context/AuthContext";
 import RootNavigator from "./src/navigation/RootNavigator";
 
 export default function App() {
@@ -8,5 +11,11 @@ export default function App() {
       <StatusBar style="dark" />
       <RootNavigator />
     </>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <RootNavigator />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

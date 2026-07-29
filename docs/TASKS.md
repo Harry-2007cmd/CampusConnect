@@ -19,6 +19,7 @@ Implementation tasks for CampusConnect.
 - Both B and C build screens against the shared design tokens in `docs/DESIGN.md` (D-014) — confirm you've both read it before starting tasks 18-23, so Carpool and Feed/Auth/Profile don't visually diverge.
 - **Merge checkpoints:** end of Day 1 (backend API should be real and mergeable), midday Day 2 (swap mocks for real calls), end of Day 2 (everything integrated on `main`), Day 3 is `main`-only, no more branch work.
 - If two people touch the same file (e.g. navigation setup), whoever finishes first merges to `main` and the other rebases — flag it in your team chat before it happens, not after.
+- **Post-Day-1 lesson (see D-015):** when both mobile tracks start from an empty repo at the same time, they'll both rebuild the *whole* foundation (App.jsx, tokens, common components), not just the two files flagged shared above. Whoever merges first should push fast and loudly in team chat so the other person rebases onto the merged foundation instead of finishing their own parallel copy.
 
 ## Repo Structure (D-013)
 
@@ -85,29 +86,30 @@ Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md`
 
 ### Track A — Backend (do this first, others depend on it)
 
-1. Repo scaffold: FastAPI project (following Repo Structure above), Postgres connection, base migration setup
-2. Migration: `universities`, `users` (id, university_id, email, name, year, department, gender, created_at), `otp_requests` (id, email, code_hash, expires_at, consumed_at)
-3. Seed script: one university + several test accounts (mixed gender, for filter testing)
-4. `POST /auth/otp/request` `{email}` → 200, no body — validates .edu domain, sends OTP
-5. `POST /auth/otp/verify` `{email, code}` → `{access_token, user}` — creates or fetches user
-6. `GET /auth/me` (bearer token) → `{id, email, name, year, department, gender}`
-7. `PATCH /profile` `{name?, year?, department?, gender?}` → updated user object
-8. `GET /profile/:id` → user object
-9. Migration: `rides` (id, driver_id, university_id, origin, destination, departure_time, price_per_seat, seats_total, seats_available, gender_preference, notes, status, created_at), `ride_requests` (id, ride_id, rider_id, status, created_at, unique on ride+rider)
-10. `POST /rides` `{origin, destination, departure_time, price_per_seat, seats_total, gender_preference, notes?}` → ride object
-11. `GET /rides?origin=&destination=&max_price=&gender_pref=` → array of ride objects (include driver name)
-12. `GET /rides/:id` → ride object with driver info
-13. `POST /rides/:id/request` → request object (403 if gender mismatch or seats full or self-request)
-14. `POST /rides/:id/requests/:reqId/accept` and `.../decline` (driver only) → updated request; accept decrements `seats_available`
-15. `GET /rides/mine` → `{driving: [...], riding: [...]}`
-16. `POST /rides/:id/cancel` (driver only)
-17. Seed script: 10-15 realistic rides, varied price/route/gender_preference
+1. ✅ Repo scaffold: FastAPI project (following Repo Structure above), Postgres connection, base migration setup
+2. ✅ Migration: `universities`, `users` (id, university_id, email, name, year, department, gender, created_at), `otp_requests` (id, email, code_hash, expires_at, consumed_at)
+3. ✅ Seed script: one university + several test accounts (mixed gender, for filter testing)
+4. ✅ `POST /auth/otp/request` `{email}` → 200, no body — validates .edu domain, sends OTP
+5. ✅ `POST /auth/otp/verify` `{email, code}` → `{access_token, user}` — creates or fetches user
+6. ✅ `GET /auth/me` (bearer token) → `{id, email, name, year, department, gender}`
+7. ✅ `PATCH /profile` `{name?, year?, department?, gender?}` → updated user object
+8. ✅ `GET /profile/:id` → user object
+9. ✅ Migration: `rides` (id, driver_id, university_id, origin, destination, departure_time, price_per_seat, seats_total, seats_available, gender_preference, notes, status, created_at), `ride_requests` (id, ride_id, rider_id, status, created_at, unique on ride+rider)
+10. ✅ `POST /rides` `{origin, destination, departure_time, price_per_seat, seats_total, gender_preference, notes?}` → ride object
+11. ✅ `GET /rides?origin=&destination=&max_price=&gender_pref=` → array of ride objects (include driver name)
+12. ✅ `GET /rides/:id` → ride object with driver info
+13. ✅ `POST /rides/:id/request` → request object (403 if gender mismatch or seats full or self-request)
+14. ✅ `POST /rides/:id/requests/:reqId/accept` and `.../decline` (driver only) → updated request; accept decrements `seats_available`
+15. ✅ `GET /rides/mine` → `{driving: [...], riding: [...]}`
+16. ✅ `POST /rides/:id/cancel` (driver only)
+17. ✅ Seed script: 10-15 realistic rides, varied price/route/gender_preference
 
 **Push API contracts (request/response shapes above) to the team chat as soon as each endpoint is done — B and C are coding against these live.**
 
 ### Track B & C — shared, before screens
 
 17.5. Both mobile tracks read `docs/DESIGN.md` (D-014) and confirm the color/spacing/typography/component-state tokens before starting any screen in tasks 18-23. If either track wants to deviate, flag it in team chat first — don't fork the design silently.
+   - **Status: partially held.** Colors, spacing, and radius matched exactly across both tracks. The `typography` object *shape* diverged (nested `.size` vs flat) and the shared `common/` component prop APIs (`Button`, `Loader`, `EmptyState`) were built independently without cross-checking. Fixed in "Day 1.5" below — see D-015. Lesson for future shared specs: document the literal exported shape/interface, not just the values.
 
 ### Track B — Carpool Mobile (build against mocked API first)
 
@@ -116,12 +118,29 @@ Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md`
 
 ### Track C — Core Mobile (build against mocked API first)
 
-20. Welcome + email-entry screen
-21. OTP-entry screen
-22. Token storage + auth context (real logic in `context/AuthContext.jsx`, just point at mocked/local responses until A's endpoints are live)
-23. Profile setup screen (name, year, department, gender)
+20. ✅ Welcome + email-entry screen
+21. ✅ OTP-entry screen
+22. ✅ Token storage + auth context (real logic in `context/AuthContext.jsx`, just point at mocked/local responses until A's endpoints are live)
+23. ✅ Profile setup screen (name, year, department, gender)
 
-**End of Day 1 checkpoint:** A's full API is real and testable via curl/Postman. B and C have working screens against mocked data, ready to swap in real calls.
+**End of Day 1 checkpoint:** A's full API is real and testable via curl/Postman. B and C have working screens against mocked data, ready to swap in real calls. **✅ Reached — but do "Day 1.5" below before continuing into Day 2, or the merge will break screens.**
+
+---
+
+## Day 1.5 — Merge Reconciliation (do this first, before continuing Day 2)
+
+Found during the Day 1 cross-branch review — see D-015 in `DECISIONS.md` for full reasoning. None of this is new feature work, just reconciling two independently-scaffolded copies of the mobile foundation before Track B and Track C's code can safely coexist on `main`.
+
+19.1. `theme/tokens.js`: keep flat `typography.*` keys, add a nested `typography.size` object with the same values so Carpool's existing components keep working unchanged.
+19.2. `components/common/Button.jsx`: accept both `title` and `label` props (`text = title ?? label`).
+19.3. `components/common/Loader.jsx`: adopt the Carpool version (optional `label` under the spinner) — superset, no call-site changes needed.
+19.4. `components/common/EmptyState.jsx`: adopt the Carpool version (optional `tone` prop) — superset, no call-site changes needed.
+19.5. `App.jsx`: use the Core version (`SafeAreaProvider` + `AuthProvider` wrapper).
+19.6. `navigation/RootNavigator.jsx`: manually merge — Core's Auth/Profile stack + Carpool's `BrowseRides`/`RideDetail` stack, with post-auth routing (this doubles as task 33): incomplete profile → `ProfileSetup`; complete profile → `BrowseRides` (retire `MainPlaceholderScreen`).
+19.7. `package.json` / `app.json`: union of dependencies; keep the fuller `app.json`.
+19.8. Fix the two cross-track data-contract bugs now, while they're cheap: Profile screen's gender `value`s → `male`/`female`/`other`; `rideService.js` real-API branch omits `gender_pref` when the filter is `"any"`; `mocks/rides.mock.js` `status` → `"active"` (not `"open"`).
+
+**Once 19.1–19.8 are done and merged to `main`, resume with Day 2 below.**
 
 ---
 
@@ -135,16 +154,16 @@ Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md`
 
 ### Track B — Carpool Mobile
 
-27. Swap mocked data in `rideService.js` for real `/rides` calls
+27. Swap mocked data in `rideService.js` for real `/rides` calls (the `gender_pref="any"` fix from Day 1.5/D-015 should already be in place — this is now just the mock→real swap)
 28. Offer a Ride screen: origin, destination, time, price/seat, seats, gender preference → `POST /rides`
 29. My Rides screen: Driving tab (accept/decline) + Riding tab (my requests + status) → `/rides/mine`
 30. Full navigation between all Carpool screens — this is the priority polish target, spend remaining time here
 
 ### Track C — Core Mobile
 
-31. Swap mocked Auth/Profile calls for real endpoints
+31. Swap mocked Auth/Profile calls for real endpoints (the gender-value fix from Day 1.5/D-015 should already be in place)
 32. Feed screen: list + create post + upvote (basic, no comments unless time remains)
-33. Post-auth routing: new user → profile setup, returning user → Carpool browse (not Feed — Carpool is the lead feature)
+33. Post-auth routing: new user → profile setup, returning user → Carpool browse (not Feed — Carpool is the lead feature) — (this routing was already implemented during Day 1.5's `RootNavigator` merge; just confirm it still works once real Auth data is flowing)
 
 **Merge everyone to `main` by end of Day 2. End of Day 2 checkpoint:** full app runs on `main`, Carpool fully clickable with real data and working filters, Feed and Auth/Profile functional.
 
