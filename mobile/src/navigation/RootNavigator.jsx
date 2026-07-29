@@ -1,7 +1,7 @@
 // ⚠️ Shared file (see CLAUDE.md / D-013) — flag non-trivial changes before merging
-// to `main` so Track B (mobile-carpool) can coordinate. Track B's Carpool stack/tabs
-// will be added here once merged; this file currently only wires up Auth/Profile
-// (Track C scope) plus a temporary post-auth placeholder.
+// to `main`. Combines Track C's Auth/Profile stack with Track B's Carpool stack per
+// D-015 #5/#7: authenticated + incomplete profile -> ProfileSetup; authenticated +
+// complete profile -> Carpool BrowseRides (MainPlaceholderScreen retired, task 33).
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -9,7 +9,8 @@ import WelcomeScreen from "../screens/auth/WelcomeScreen";
 import EmailEntryScreen from "../screens/auth/EmailEntryScreen";
 import OtpEntryScreen from "../screens/auth/OtpEntryScreen";
 import ProfileSetupScreen from "../screens/profile/ProfileSetupScreen";
-import MainPlaceholderScreen from "../screens/MainPlaceholderScreen";
+import BrowseRidesScreen from "../screens/carpool/BrowseRidesScreen";
+import RideDetailScreen from "../screens/carpool/RideDetailScreen";
 import Loader from "../components/common/Loader";
 import { useAuth } from "../hooks/useAuth";
 
@@ -34,7 +35,10 @@ export default function RootNavigator() {
         ) : !isProfileComplete ? (
           <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         ) : (
-          <Stack.Screen name="Main" component={MainPlaceholderScreen} />
+          <Stack.Group>
+            <Stack.Screen name="BrowseRides" component={BrowseRidesScreen} />
+            <Stack.Screen name="RideDetail" component={RideDetailScreen} />
+          </Stack.Group>
         )}
       </Stack.Navigator>
     </NavigationContainer>

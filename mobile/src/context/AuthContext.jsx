@@ -23,17 +23,22 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function restoreSession() {
+    console.log("[AuthContext] restoreSession: start");
     try {
       const storedToken = await SecureStore.getItemAsync(TOKEN_KEY);
+      console.log("[AuthContext] restoreSession: storedToken =", storedToken);
       if (storedToken) {
         const me = await getMe(storedToken);
+        console.log("[AuthContext] restoreSession: getMe resolved", me);
         setToken(storedToken);
         setUser(me);
       }
-    } catch {
+    } catch (err) {
       // Stored token is invalid/expired — fall back to logged-out state.
+      console.log("[AuthContext] restoreSession: caught error", err);
       await SecureStore.deleteItemAsync(TOKEN_KEY);
     } finally {
+      console.log("[AuthContext] restoreSession: finally, setting isLoading=false");
       setIsLoading(false);
     }
   }

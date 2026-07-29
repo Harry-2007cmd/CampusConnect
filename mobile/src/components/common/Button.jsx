@@ -2,7 +2,8 @@ import { Pressable, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { colors, spacing, radius, typography } from "../../theme/tokens";
 
 // variant: "primary" | "secondary" | "ghost"
-export default function Button({ title, onPress, variant = "primary", disabled = false, loading = false }) {
+export default function Button({ title, label, onPress, variant = "primary", disabled = false, loading = false }) {
+  const text = title ?? label;
   const isDisabled = disabled || loading;
 
   return (
@@ -19,7 +20,7 @@ export default function Button({ title, onPress, variant = "primary", disabled =
       {loading ? (
         <ActivityIndicator color={variant === "primary" ? colors.surface : colors.primary} />
       ) : (
-        <Text style={[styles.label, textVariantStyles[variant]]}>{title}</Text>
+        <Text style={[styles.label, textVariantStyles[variant]]}>{text}</Text>
       )}
     </Pressable>
   );

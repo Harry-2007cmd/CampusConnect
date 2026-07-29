@@ -9,16 +9,14 @@
       "backgroundColor": "#FFF8F3"
     },
     "assetBundlePatterns": ["**/*"],
-    "ios": { "supportsTablet": true },
-    "android": {},
-    "web": {}
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FFF8F3"
       }
-    }
+    },
+    "web": {}
   }
 }

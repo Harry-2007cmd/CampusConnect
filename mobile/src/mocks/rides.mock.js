@@ -16,7 +16,7 @@ export const MOCK_RIDES = [
     seats_available: 2,
     gender_preference: "any",
     notes: "Leaving right after breakfast, can wait 10 min max.",
-    status: "open",
+    status: "active",
   },
   {
     id: "ride-2",
@@ -31,7 +31,7 @@ export const MOCK_RIDES = [
     seats_available: 1,
     gender_preference: "male",
     notes: "",
-    status: "open",
+    status: "active",
   },
   {
     id: "ride-3",
@@ -46,7 +46,7 @@ export const MOCK_RIDES = [
     seats_available: 3,
     gender_preference: "female",
     notes: "Early morning flight run, please be on time.",
-    status: "open",
+    status: "active",
   },
   {
     id: "ride-4",
@@ -61,7 +61,7 @@ export const MOCK_RIDES = [
     seats_available: 0,
     gender_preference: "any",
     notes: "Daily commute, recurring.",
-    status: "open",
+    status: "active",
   },
 ];
 

@@ -40,4 +40,13 @@ export const typography = {
     semibold: "600",
     bold: "700",
   },
+  // Nested mirror of the flat keys above — mobile-carpool's components read
+  // typography.size.*; kept in sync with the flat keys (D-015).
+  size: {
+    caption: 12,
+    bodySmall: 14,
+    body: 16,
+    subheading: 20,
+    title: 24,
+  },
 };

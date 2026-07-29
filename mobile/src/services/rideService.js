@@ -39,7 +39,7 @@ export async function getRides(filters = {}) {
       origin: origin || undefined,
       destination: destination || undefined,
       max_price: maxPrice ?? undefined,
-      gender_pref: genderPref || undefined,
+      gender_pref: genderPref && genderPref !== "any" ? genderPref : undefined,
     },
   });
   return data;

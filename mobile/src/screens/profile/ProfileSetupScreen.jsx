@@ -19,8 +19,8 @@ const YEAR_OPTIONS = [
 // Self-reported at the same trust level as the rest of the app's identity model (D-001).
 // Backs Carpool's gender-preference filter (D-012) — do not remove.
 const GENDER_OPTIONS = [
-  { label: "Woman", value: "woman" },
-  { label: "Man", value: "man" },
+  { label: "Woman", value: "female" },
+  { label: "Man", value: "male" },
   { label: "Other", value: "other" },
 ];
 

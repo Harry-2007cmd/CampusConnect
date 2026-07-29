@@ -131,16 +131,16 @@ Design tokens (color/type/spacing/radius/component states): see `docs/DESIGN.md`
 
 Found during the Day 1 cross-branch review — see D-015 in `DECISIONS.md` for full reasoning. None of this is new feature work, just reconciling two independently-scaffolded copies of the mobile foundation before Track B and Track C's code can safely coexist on `main`.
 
-19.1. `theme/tokens.js`: keep flat `typography.*` keys, add a nested `typography.size` object with the same values so Carpool's existing components keep working unchanged.
-19.2. `components/common/Button.jsx`: accept both `title` and `label` props (`text = title ?? label`).
-19.3. `components/common/Loader.jsx`: adopt the Carpool version (optional `label` under the spinner) — superset, no call-site changes needed.
-19.4. `components/common/EmptyState.jsx`: adopt the Carpool version (optional `tone` prop) — superset, no call-site changes needed.
-19.5. `App.jsx`: use the Core version (`SafeAreaProvider` + `AuthProvider` wrapper).
-19.6. `navigation/RootNavigator.jsx`: manually merge — Core's Auth/Profile stack + Carpool's `BrowseRides`/`RideDetail` stack, with post-auth routing (this doubles as task 33): incomplete profile → `ProfileSetup`; complete profile → `BrowseRides` (retire `MainPlaceholderScreen`).
-19.7. `package.json` / `app.json`: union of dependencies; keep the fuller `app.json`.
-19.8. Fix the two cross-track data-contract bugs now, while they're cheap: Profile screen's gender `value`s → `male`/`female`/`other`; `rideService.js` real-API branch omits `gender_pref` when the filter is `"any"`; `mocks/rides.mock.js` `status` → `"active"` (not `"open"`).
+19.1. ✅ `theme/tokens.js`: keep flat `typography.*` keys, add a nested `typography.size` object with the same values so Carpool's existing components keep working unchanged.
+19.2. ✅ `components/common/Button.jsx`: accept both `title` and `label` props (`text = title ?? label`).
+19.3. ✅ `components/common/Loader.jsx`: adopt the Carpool version (optional `label` under the spinner) — superset, no call-site changes needed.
+19.4. ✅ `components/common/EmptyState.jsx`: adopt the Carpool version (optional `tone` prop) — superset, no call-site changes needed.
+19.5. ✅ `App.jsx`: use the Core version (`SafeAreaProvider` + `AuthProvider` wrapper).
+19.6. ✅ `navigation/RootNavigator.jsx`: manually merge — Core's Auth/Profile stack + Carpool's `BrowseRides`/`RideDetail` stack, with post-auth routing (this doubles as task 33): incomplete profile → `ProfileSetup`; complete profile → `BrowseRides` (retire `MainPlaceholderScreen`).
+19.7. ✅ `package.json` / `app.json`: union of dependencies; keep the fuller `app.json`.
+19.8. ✅ Fix the two cross-track data-contract bugs now, while they're cheap: Profile screen's gender `value`s → `male`/`female`/`other`; `rideService.js` real-API branch omits `gender_pref` when the filter is `"any"`; `mocks/rides.mock.js` `status` → `"active"` (not `"open"`).
 
-**Once 19.1–19.8 are done and merged to `main`, resume with Day 2 below.**
+**19.1–19.8 done — see CHANGELOG 2026-07-29 entry. Resume with Day 2 below.**
 
 ---
 

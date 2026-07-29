@@ -2,6 +2,18 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-29 (Day 1.5 merge reconciliation applied — tasks 19.1-19.8)
+
+- Applied the D-015 reconciliation that was decided but never actually landed in code after the three-branch merge to `main` — the raw git merge had no conflict markers, but the mobile-carpool and mobile-core foundations were left semantically incompatible (Carpool screens crashing/orphaned).
+- Also fixed two merge-conflict-resolution artifacts introduced while investigating the above: `mobile/App.jsx` had a duplicated import and two concatenated top-level JSX return blocks (invalid JSX — both sides of a conflict kept instead of one chosen); `mobile/app.json` had a duplicate `ios` key and a missing comma (invalid JSON, same cause).
+- `theme/tokens.js`: added nested `typography.size.*` mirroring the flat keys, matching D-015 #1.
+- `components/common/Button.jsx`: now accepts `title` or `label`.
+- `components/common/Loader.jsx`: now accepts an optional `label` under the spinner.
+- `components/common/EmptyState.jsx`: now accepts an optional `tone` prop (`"error"` tints the title).
+- `navigation/RootNavigator.jsx`: merged Carpool's `BrowseRides`/`RideDetail` stack in; post-auth routing now sends a complete profile to `BrowseRides` instead of the retired `MainPlaceholderScreen` (closes task 33). Deleted `screens/MainPlaceholderScreen.jsx` (unused after the merge).
+- Fixed the three cross-track data-contract bugs from D-015 #7: `ProfileSetupScreen` gender values (`male`/`female`/`other`, not `woman`/`man`), `rideService.js` omits `gender_pref` when the filter is `"any"` instead of sending it literally, `mocks/rides.mock.js` `status` uses `"active"` not `"open"`.
+- Updated `TASKS.md` to check off 19.1-19.8.
+
 ## 2026-07-28 (Carpool mobile scaffold + Browse/Detail screens — tasks 18-19)
 
 - First code in the repo. Scaffolded the `mobile/` Expo + React Navigation project (package.json, app.json, babel.config.js, App.jsx) since no mobile code existed yet — required to make tasks 18-19 runnable, not just isolated components.

@@ -3,10 +3,10 @@ import Button from "./Button";
 import { colors, spacing, typography } from "../../theme/tokens";
 
 // Friendly, specific empty/error copy — see docs/DESIGN.md "Required States".
-export default function EmptyState({ title, message, actionLabel, onAction }) {
+export default function EmptyState({ title, message, actionLabel, onAction, tone = "neutral" }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, tone === "error" && styles.titleError]}>{title}</Text>
       {message ? <Text style={styles.message}>{message}</Text> : null}
       {actionLabel && onAction ? (
         <View style={styles.action}>
@@ -31,6 +31,9 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: "center",
     marginBottom: spacing.sm,
+  },
+  titleError: {
+    color: colors.error,
   },
   message: {
     fontSize: typography.body,
