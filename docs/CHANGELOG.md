@@ -2,6 +2,22 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-29 (task 26 — cross-branch integration review + bug fixes)
+
+- Reviewed all of Day 1/1.5/Day 2 backend and mobile code against `TASKS.md`'s checked-off items to confirm the checkmarks reflect real, working code (they did) before resuming Day 2 work.
+- Fixed three real bugs found during review, all in `backend/app/services/ride_service.py` and `backend/app/schemas/auth.py`:
+  - `accept_request()` had a TOCTOU race: it read `seats_available`, checked it, then decremented with no row lock, so two concurrent accepts on a ride's last seat could both pass the check and oversell it. Added `SELECT ... FOR UPDATE` on the ride row (this is a safety-relevant fix, not a scope addition — the seat-availability guarantee was already required by task 13/16, just not race-safe).
+  - `accept_request()`/`decline_request()` never populated `rider_name` on the returned `RideRequestOut`, unlike `request_ride()` — added a shared `_with_rider_name()` helper used by all three.
+  - OTP email lookups (`otp_service.py`, `auth_service.py`, `User.email` matching) were case-sensitive with no normalization, so a differently-cased email between `/auth/otp/request` and `/auth/otp/verify` (e.g. autocapitalized by a keyboard) would silently fail OTP verification. Added a `field_validator` on `OtpRequestIn`/`OtpVerifyIn` in `schemas/auth.py` to lowercase email on input.
+- Removed now-dead mock code per "no mocks should remain, everything talks to the real backend" — deleted `mobile/src/mocks/` (`auth.mock.js`, `rides.mock.js`) entirely, and removed the `USE_MOCKS` flags and dead mock imports from `authService.js`/`rideService.js` (both were already permanently `false`, this is cleanup not a behavior change). `getMe`/`updateProfile` also dropped their unused `token` parameter (the request interceptor in `api.js` already reads the token from `SecureStore`); updated the two call sites in `AuthContext.jsx` accordingly.
+- Created `backend/.env` and `mobile/.env` (both gitignored) from their `.example` files for local dev. `mobile/.env`'s `EXPO_PUBLIC_API_URL` is set to the dev machine's Wi-Fi LAN IP since the team is testing on a physical phone via Expo Go (`localhost` doesn't resolve from a phone) — needs updating if the phone isn't on the same Wi-Fi network as the dev machine.
+- Installed Node.js LTS (v24.18.0) on the dev machine via `winget` — verified working. PostgreSQL 17 install via `winget` failed twice (first attempt hung/stalled on the download with no network throughput and had to be killed; second attempt downloaded and hash-verified but the underlying EDB installer exited with code 1 partway through — files are present under `C:\Program Files\PostgreSQL\17` but the install isn't confirmed functional yet). **Backend is not runnable end-to-end until this is resolved** — this blocks the "run the full app today" goal, not any code correctness issue.
+
+## 2026-07-29 (task 25 — Feed seed data)
+
+- Backend: `scripts/seed.py` now seeds 10 demo posts (`POST_TEMPLATES`) spread across the existing seeded users, covering a few categories of campus chatter (events, marketplace, study groups, lost & found, general) as plain `content` text — no `category` field was added to the `Post` model/schema, since D-011 keeps Feed deliberately minimal. Idempotent like the existing user/ride seeding: skips if any post already exists for the university. `GET /posts` will no longer return an empty list on a fresh seed.
+- Checked off task 25 in `TASKS.md`.
+
 ## 2026-07-29 (tasks 24, 32 — Feed backend + Feed screen)
 
 - Backend (task 24): added `Post` model (`author_id`, `university_id`, `content`, `upvote_count`, `created_at` — deliberately minimal, no categories/comments/moderation per D-011), `PostCreateIn`/`PostOut` schemas, `post_service.py`, and `routers/posts.py` (`POST /posts`, `GET /posts`, `POST /posts/:id/upvote`, all thin per the router convention). `GET /posts` is public like `GET /rides`; create/upvote require auth. Upvote is a simple counter increment with no per-user dedup — consistent with D-011's "no rate limiting/abuse-prevention" hackathon cut, not a bug. Added migration `0003_posts.py` and registered the router in `main.py`.

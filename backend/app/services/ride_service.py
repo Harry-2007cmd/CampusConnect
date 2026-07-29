@@ -18,6 +18,13 @@ async def _with_driver_name(db: AsyncSession, ride: Ride) -> Ride:
     return ride
 
 
+async def _with_rider_name(db: AsyncSession, ride_request: RideRequest) -> RideRequest:
+    result = await db.execute(select(User).where(User.id == ride_request.rider_id))
+    rider = result.scalar_one_or_none()
+    ride_request.rider_name = rider.name if rider else None
+    return ride_request
+
+
 async def create_ride(db: AsyncSession, driver: User, payload: RideCreateIn) -> Ride:
     ride = Ride(
         driver_id=driver.id,
@@ -121,7 +128,15 @@ async def _get_request_for_ride(db: AsyncSession, ride_id: uuid.UUID, request_id
 async def accept_request(
     db: AsyncSession, ride_id: uuid.UUID, request_id: uuid.UUID, driver: User
 ) -> RideRequest:
-    ride = await _get_owned_ride(db, ride_id, driver)
+    # Row lock so two concurrent accepts on the last seat can't both pass the
+    # seats_available check before either commits (would oversell the ride).
+    result = await db.execute(select(Ride).where(Ride.id == ride_id).with_for_update())
+    ride = result.scalar_one_or_none()
+    if not ride:
+        raise NotFoundError("Ride not found")
+    if ride.driver_id != driver.id:
+        raise ForbiddenError("Only the driver can manage this ride")
+
     ride_request = await _get_request_for_ride(db, ride_id, request_id)
 
     if ride_request.status != RideRequestStatusEnum.pending:
@@ -133,6 +148,7 @@ async def accept_request(
     ride.seats_available -= 1
     await db.commit()
     await db.refresh(ride_request)
+    await _with_rider_name(db, ride_request)
     return ride_request
 
 
@@ -148,6 +164,7 @@ async def decline_request(
     ride_request.status = RideRequestStatusEnum.declined
     await db.commit()
     await db.refresh(ride_request)
+    await _with_rider_name(db, ride_request)
     return ride_request
 
 

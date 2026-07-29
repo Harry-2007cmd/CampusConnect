@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
       const storedToken = await SecureStore.getItemAsync(TOKEN_KEY);
       console.log("[AuthContext] restoreSession: storedToken =", storedToken);
       if (storedToken) {
-        const me = await getMe(storedToken);
+        const me = await getMe();
         console.log("[AuthContext] restoreSession: getMe resolved", me);
         setToken(storedToken);
         setUser(me);
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
   }
 
   async function saveProfile(updates) {
-    const updatedUser = await updateProfile(token, updates);
+    const updatedUser = await updateProfile(updates);
     setUser(updatedUser);
     return updatedUser;
   }

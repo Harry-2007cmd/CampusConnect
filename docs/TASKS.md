@@ -149,8 +149,8 @@ Found during the Day 1 cross-branch review — see D-015 in `DECISIONS.md` for f
 ### Track A — Backend
 
 24. ✅ `POST /posts`, `GET /posts`, `POST /posts/:id/upvote` (Feed, basic)
-25. Seed script: real, specific feed posts across a few categories
-26. Available for integration support — this is when B and C swap mocks for real API calls; be responsive to bug reports
+25. ✅ Seed script: real, specific feed posts across a few categories
+26. 🔄 Available for integration support — this is when B and C swap mocks for real API calls; be responsive to bug reports. **In progress 2026-07-29:** cross-branch review done, 3 backend bugs fixed + dead mock code removed (see CHANGELOG). Blocked on environment setup (Postgres install failing locally) before the app can actually run end-to-end — not a code issue.
 
 ### Track B — Carpool Mobile
 
