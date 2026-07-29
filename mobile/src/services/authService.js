@@ -1,9 +1,9 @@
 import { api } from "./api";
 import { mockRequestOtp, mockVerifyOtp, mockGetMe, mockUpdateProfile } from "../mocks/auth.mock";
 
-// Backend not live yet (see CLAUDE.md) — flip to false once Track A's /auth and /profile
-// endpoints are deployed. Mirrors backend/app/routers/auth.py + profile.py 1:1.
-const USE_MOCKS = true;
+// Backend is live as of task 31 — flip back to true only if working offline against mocks.
+// Mirrors backend/app/routers/auth.py + profile.py 1:1.
+const USE_MOCKS = false;
 
 export async function requestOtp(email) {
   if (USE_MOCKS) return mockRequestOtp(email);

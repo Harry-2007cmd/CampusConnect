@@ -2,6 +2,32 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
+## 2026-07-29 (tasks 24, 32 — Feed backend + Feed screen)
+
+- Backend (task 24): added `Post` model (`author_id`, `university_id`, `content`, `upvote_count`, `created_at` — deliberately minimal, no categories/comments/moderation per D-011), `PostCreateIn`/`PostOut` schemas, `post_service.py`, and `routers/posts.py` (`POST /posts`, `GET /posts`, `POST /posts/:id/upvote`, all thin per the router convention). `GET /posts` is public like `GET /rides`; create/upvote require auth. Upvote is a simple counter increment with no per-user dedup — consistent with D-011's "no rate limiting/abuse-prevention" hackathon cut, not a bug. Added migration `0003_posts.py` and registered the router in `main.py`.
+- Mobile (task 32): added `services/postService.js` (real API only, no mocks — backend was already live when this was built), `components/feed/PostCard.jsx` + `UpvoteButton.jsx`, and `screens/feed/FeedScreen.jsx` (list + inline composer + upvote, no comments per basic scope).
+- Wired `Feed` into `navigation/RootNavigator.jsx` (⚠️ shared file) and added a "Feed" entry-point button to `BrowseRidesScreen`'s header row, alongside the existing "My Rides"/"Offer a ride" buttons — Carpool remains the post-auth landing screen per D-012/D-015, Feed is reached from there.
+- Not done as part of this: task 25 (seed script posts) — no demo post data exists yet, `GET /posts` will return an empty list until either seeded or posted to via the app.
+
+## 2026-07-29 (tasks 28-29 — Offer Ride and My Rides screens)
+
+- Added `mobile/src/screens/carpool/OfferRideScreen.jsx`: origin/destination/date/time/price/seats/gender-preference/notes form → `POST /rides`. No date-picker library is installed, so date and time are entered as two plain text fields (`YYYY-MM-DD` / `HH:MM`) and combined client-side into an ISO timestamp via `new Date(...).toISOString()`, avoiding a new native dependency mid-hackathon.
+- Added `mobile/src/screens/carpool/MyRidesScreen.jsx`: Driving tab (own rides + pending/accepted/declined requests, Accept/Decline actions) and Riding tab (own requests + ride info + status) → `GET /rides/mine`, `POST /rides/:id/requests/:reqId/accept|decline`.
+- Added `createRide`, `getMyRides`, `acceptRequest`, `declineRequest` to `rideService.js` (real API only — no mock equivalents needed since `USE_MOCKS` was already flipped off in task 27).
+- Wired both new screens into `navigation/RootNavigator.jsx` (⚠️ shared file — flag before merging) inside the authenticated Carpool stack.
+- `BrowseRidesScreen` got a header row with "My Rides" / "Offer a ride" buttons as the entry point into the two new screens — previously there was no in-app path to reach them.
+
+## 2026-07-29 (task 31 — authService swapped off mocks)
+
+- `mobile/src/services/authService.js`: `USE_MOCKS` flipped to `false`; `requestOtp`/`verifyOtp`/`getMe`/`updateProfile` now hit the real `/auth` and `/profile` endpoints.
+- Confirmed no fallout: `EmailEntryScreen`'s `.edu` check is independent client-side validation (not the mock's), `OtpEntryScreen` has no mock-only assumptions, and the year-value and gender-value contract fixes needed for this swap were already applied (task 27's changelog entry, D-015 #7).
+
+## 2026-07-29 (task 27 — rideService swapped off mocks)
+
+- `mobile/src/services/rideService.js`: `USE_MOCKS` flipped to `false`; `getRides`/`getRideById`/`requestSeat` now hit the real `/rides` endpoints.
+- Fixed a latent bug found while doing the swap: the file imported `api` as a default export (`import api from "./api"`), but `services/api.js` only exports it as a named export (`export const api`). Under mocks this was dead code and never surfaced; it would have thrown `Cannot read properties of undefined` on the very first real API call. Changed to `import { api } from "./api"`, matching `authService.js`.
+- Also fixed a pre-existing contract bug ahead of task 31: `ProfileSetupScreen`'s `YEAR_OPTIONS` sent `year` as a string (`"1"`-`"4"`, and `"5+"`), but the backend `ProfileUpdateIn.year` is a strict `int | None` — `"5+"` can never parse as an int. Changed `YEAR_OPTIONS` values to numbers `1`-`5` so `PATCH /profile` won't 422 once Auth/Profile also swap off mocks.
+
 ## 2026-07-29 (Day 1.5 merge reconciliation applied — tasks 19.1-19.8)
 
 - Applied the D-015 reconciliation that was decided but never actually landed in code after the three-branch merge to `main` — the raw git merge had no conflict markers, but the mobile-carpool and mobile-core foundations were left semantically incompatible (Carpool screens crashing/orphaned).

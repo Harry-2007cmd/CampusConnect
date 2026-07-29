@@ -11,6 +11,9 @@ import OtpEntryScreen from "../screens/auth/OtpEntryScreen";
 import ProfileSetupScreen from "../screens/profile/ProfileSetupScreen";
 import BrowseRidesScreen from "../screens/carpool/BrowseRidesScreen";
 import RideDetailScreen from "../screens/carpool/RideDetailScreen";
+import OfferRideScreen from "../screens/carpool/OfferRideScreen";
+import MyRidesScreen from "../screens/carpool/MyRidesScreen";
+import FeedScreen from "../screens/feed/FeedScreen";
 import Loader from "../components/common/Loader";
 import { useAuth } from "../hooks/useAuth";
 
@@ -38,6 +41,9 @@ export default function RootNavigator() {
           <Stack.Group>
             <Stack.Screen name="BrowseRides" component={BrowseRidesScreen} />
             <Stack.Screen name="RideDetail" component={RideDetailScreen} />
+            <Stack.Screen name="OfferRide" component={OfferRideScreen} />
+            <Stack.Screen name="MyRides" component={MyRidesScreen} />
+            <Stack.Screen name="Feed" component={FeedScreen} />
           </Stack.Group>
         )}
       </Stack.Navigator>

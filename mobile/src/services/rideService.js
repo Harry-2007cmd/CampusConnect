@@ -1,10 +1,9 @@
-import api from "./api";
+import { api } from "./api";
 import { MOCK_RIDES, findMockRideById } from "../mocks/rides.mock";
 
-// Mirrors backend/app/routers/rides.py 1:1 (TASKS.md tasks 10-16). Currently
-// backed by src/mocks/rides.mock.js — swap the body of each function for the
-// real `api.get/post` call once Track A's endpoints are live (task 27).
-const USE_MOCKS = true;
+// Mirrors backend/app/routers/rides.py 1:1 (TASKS.md tasks 10-16). Backend is
+// live as of task 27 — flip back to true only if working offline against mocks.
+const USE_MOCKS = false;
 
 function matchesFilters(ride, filters) {
   const { origin, destination, maxPrice, genderPref } = filters;
@@ -58,5 +57,25 @@ export async function requestSeat(id) {
     return { id: `req-${id}`, ride_id: id, status: "pending" };
   }
   const { data } = await api.post(`/rides/${id}/request`);
+  return data;
+}
+
+export async function createRide(payload) {
+  const { data } = await api.post("/rides", payload);
+  return data;
+}
+
+export async function getMyRides() {
+  const { data } = await api.get("/rides/mine");
+  return data;
+}
+
+export async function acceptRequest(rideId, requestId) {
+  const { data } = await api.post(`/rides/${rideId}/requests/${requestId}/accept`);
+  return data;
+}
+
+export async function declineRequest(rideId, requestId) {
+  const { data } = await api.post(`/rides/${rideId}/requests/${requestId}/decline`);
   return data;
 }

@@ -148,21 +148,21 @@ Found during the Day 1 cross-branch review — see D-015 in `DECISIONS.md` for f
 
 ### Track A — Backend
 
-24. `POST /posts`, `GET /posts`, `POST /posts/:id/upvote` (Feed, basic)
+24. ✅ `POST /posts`, `GET /posts`, `POST /posts/:id/upvote` (Feed, basic)
 25. Seed script: real, specific feed posts across a few categories
 26. Available for integration support — this is when B and C swap mocks for real API calls; be responsive to bug reports
 
 ### Track B — Carpool Mobile
 
-27. Swap mocked data in `rideService.js` for real `/rides` calls (the `gender_pref="any"` fix from Day 1.5/D-015 should already be in place — this is now just the mock→real swap)
-28. Offer a Ride screen: origin, destination, time, price/seat, seats, gender preference → `POST /rides`
-29. My Rides screen: Driving tab (accept/decline) + Riding tab (my requests + status) → `/rides/mine`
+27. ✅ Swap mocked data in `rideService.js` for real `/rides` calls (the `gender_pref="any"` fix from Day 1.5/D-015 should already be in place — this is now just the mock→real swap)
+28. ✅ Offer a Ride screen: origin, destination, time, price/seat, seats, gender preference → `POST /rides`
+29. ✅ My Rides screen: Driving tab (accept/decline) + Riding tab (my requests + status) → `/rides/mine`
 30. Full navigation between all Carpool screens — this is the priority polish target, spend remaining time here
 
 ### Track C — Core Mobile
 
-31. Swap mocked Auth/Profile calls for real endpoints (the gender-value fix from Day 1.5/D-015 should already be in place)
-32. Feed screen: list + create post + upvote (basic, no comments unless time remains)
+31. ✅ Swap mocked Auth/Profile calls for real endpoints (the gender-value fix from Day 1.5/D-015 should already be in place)
+32. ✅ Feed screen: list + create post + upvote (basic, no comments unless time remains)
 33. Post-auth routing: new user → profile setup, returning user → Carpool browse (not Feed — Carpool is the lead feature) — (this routing was already implemented during Day 1.5's `RootNavigator` merge; just confirm it still works once real Auth data is flowing)
 
 **Merge everyone to `main` by end of Day 2. End of Day 2 checkpoint:** full app runs on `main`, Carpool fully clickable with real data and working filters, Feed and Auth/Profile functional.

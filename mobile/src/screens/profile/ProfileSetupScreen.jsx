@@ -9,11 +9,11 @@ import { colors, spacing, typography } from "../../theme/tokens";
 
 // Trimmed profile fields per D-011: name, year, department, gender only.
 const YEAR_OPTIONS = [
-  { label: "1st", value: "1" },
-  { label: "2nd", value: "2" },
-  { label: "3rd", value: "3" },
-  { label: "4th", value: "4" },
-  { label: "5th+", value: "5+" },
+  { label: "1st", value: 1 },
+  { label: "2nd", value: 2 },
+  { label: "3rd", value: 3 },
+  { label: "4th", value: 4 },
+  { label: "5th+", value: 5 },
 ];
 
 // Self-reported at the same trust level as the rest of the app's identity model (D-001).

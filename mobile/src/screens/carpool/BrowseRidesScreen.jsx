@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
-import { colors, spacing } from "../../theme/tokens";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import { colors, spacing, typography } from "../../theme/tokens";
 import FilterBar from "../../components/carpool/FilterBar";
 import RideCard from "../../components/carpool/RideCard";
+import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import EmptyState from "../../components/common/EmptyState";
 import useRides from "../../hooks/useRides";
@@ -20,6 +21,15 @@ export default function BrowseRidesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>Browse Rides</Text>
+        <View style={styles.headerActions}>
+          <Button title="Feed" variant="ghost" onPress={() => navigation.navigate("Feed")} />
+          <Button title="My Rides" variant="ghost" onPress={() => navigation.navigate("MyRides")} />
+          <Button title="Offer a ride" variant="secondary" onPress={() => navigation.navigate("OfferRide")} />
+        </View>
+      </View>
+
       <View style={styles.filterWrap}>
         <FilterBar filters={filters} onChange={setFilters} />
       </View>
@@ -65,6 +75,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
+  },
+  headerRow: {
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  headerTitle: {
+    fontSize: typography.size.title,
+    fontWeight: typography.weight.bold,
+    color: colors.textPrimary,
+  },
+  headerActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
   },
   filterWrap: {
     marginBottom: spacing.sm,
