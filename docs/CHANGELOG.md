@@ -2,46 +2,6 @@
 
 All notable planning and product changes to CampusConnect. Newest first.
 
-## 2026-07-28 (Day 1 cross-branch review + merge reconciliation plan)
-
-- Reviewed all three Day 1 branches (`backend`, `mobile-carpool`, `mobile-core`) against `TASKS.md`. Backend logic (tasks 1-17) and both mobile tracks' Day 1 screens (tasks 18-23) are functionally correct against their own specs/mocks.
-- Found that both mobile tracks independently scaffolded the *entire* mobile foundation (App.jsx, RootNavigator.jsx, package.json, app.json, theme/tokens.js, and common/ Button/Loader/EmptyState) since neither branch existed yet when they started — not just the two files D-013 flagged as shared. Several of these diverged in ways that will break at merge time: `theme/tokens.js` has two incompatible `typography` shapes, and `Button.jsx` uses two different prop names (`label` vs `title`).
-- Also found two cross-track data-contract bugs that only surface once mocks are swapped for the real API (Day 2 tasks 27/31): the Profile screen's gender values don't match the backend's `GenderEnum`, and the ride gender-preference filter would over-filter results once wired to the real `/rides` endpoint.
-- Logged the full findings and fixes as D-015. Added a new "Day 1.5 — Merge Reconciliation" checklist to `TASKS.md` to be done first thing on Day 2, before tasks 27-33.
-- Retroactively logged backend's Day 1 completion below since that branch hadn't updated docs at implementation time.
-
-## 2026-07-28 (Backend Day 1 complete — Auth, Profile, Carpool API, tasks 1-17) [logged retroactively during Day 1 review]
-
-- Scaffolded the FastAPI project per the D-013 layout: config, database, deps, `core/security.py` (JWT + OTP hashing), `core/errors.py`.
-- Migration 0001: `universities`, `users` (incl. gender enum), `otp_requests`.
-- Migration 0002: `rides`, `ride_requests` (incl. gender_preference, ride_status, ride_request_status enums).
-- Implemented `/auth/otp/request`, `/auth/otp/verify`, `/auth/me`, `/profile` (GET/PATCH), and the full `/rides` surface (create/list/get/request/accept/decline/cancel/mine), matching the task 4-16 contracts.
-- Business rules (gender-preference check, seat availability, self-request block, driver-only accept/decline/cancel) implemented in `services/`, not routers, per the CLAUDE.md convention. Route ordering correctly puts `/rides/mine` before `/rides/{ride_id}` to avoid path-shadowing.
-- Seed script creates one university (Riverdale) + 7 mixed-gender test accounts + 13 varied demo rides.
-- Note: this branch did not update `CHANGELOG.md`/`TASKS.md` at implementation time, contrary to the project's documentation rule — entry added here during the Day 1 review so history is complete.
-
-## 2026-07-28 (Track C: mobile scaffold + Auth/Profile screens, tasks 20-23)
-
-- Bootstrapped the `mobile/` Expo project (no code existed yet on `mobile-core` before this) per the D-013 structure: `package.json`, `app.json`, `babel.config.js`, `App.jsx`.
-- Added `src/theme/tokens.js` implementing the D-014 color/spacing/radius/typography tokens as importable constants.
-- Built shared `common/` components: `Button`, `Loader`, `EmptyState`, plus two not explicitly listed in D-013 but needed to apply D-014 consistently: `TextField` and `ChipToggle` (pill-style toggle, reusable by Track B's `GenderToggle`/filter chips).
-- Built Auth screens (task 20-21): `WelcomeScreen`, `EmailEntryScreen` (`.edu` validation), `OtpEntryScreen`.
-- Built `ProfileSetupScreen` (task 23): name, year, department, gender — gender options kept per D-012's Carpool filter requirement.
-- Built `context/AuthContext.jsx` (task 22, shared file): token storage via `expo-secure-store`, session restore on app start, OTP send/verify, profile save/logout.
-- Built `services/api.js` (axios + JWT interceptor) and `services/authService.js`, mirroring the documented `/auth` and `/profile` routers 1:1; currently backed by `mocks/auth.mock.js` (`USE_MOCKS = true`) since Track A's backend isn't live yet — flip one flag to swap in real calls (task 31).
-- Wired `navigation/RootNavigator.jsx` (shared file): unauthenticated → Auth stack, authenticated + incomplete profile → `ProfileSetup`, authenticated + complete profile → temporary `MainPlaceholderScreen` (to be replaced by Track B's Carpool entry point per task 33).
-- Not yet run/tested: no Node.js/npm available in this environment, so `npm install` and an Expo build were not verified. Needs a real device/simulator smoke test before Day 1 checkpoint.
-
-## 2026-07-28 (Carpool mobile scaffold + Browse/Detail screens — tasks 18-19)
-
-- First code in the repo. Scaffolded the `mobile/` Expo + React Navigation project (package.json, app.json, babel.config.js, App.jsx) since no mobile code existed yet — required to make tasks 18-19 runnable, not just isolated components.
-- Built `src/theme/tokens.js` implementing the D-014 color/spacing/typography/radius tokens verbatim from `docs/DESIGN.md`.
-- Built shared `components/common/` (`Button`, `Loader`, `EmptyState`) implementing the required loading/empty/error states from `DESIGN.md`, reused across Browse Rides and Ride Detail.
-- Built `components/carpool/` (`RideCard`, `FilterBar`, `GenderToggle`) and `screens/carpool/` (`BrowseRidesScreen`, `RideDetailScreen`).
-- Added `src/mocks/rides.mock.js` matching task 11/12's documented `GET /rides` / `GET /rides/:id` response shape, and `src/services/rideService.js` mirroring the future `routers/rides.py` 1:1 (mock-backed now, one-file swap when Track A's API is live).
-- Touched two files outside `carpool/` that are flagged shared with Track C: created `src/navigation/RootNavigator.jsx` (Carpool-only stack for now — confirmed with the user before writing) and left `context/AuthContext.jsx` untouched (screens don't need auth yet since they run on mocked data).
-- Added a root `.gitignore` (didn't exist) to exclude `node_modules/`, `.expo/`, `.env`.
-
 ## 2026-07-28 (shared UI/UX design system added)
 
 - Identified a gap: Day 1 planning covered screen inventory, component boundaries, and a Day 3 polish task, but no actual shared visual language (colors, spacing, typography, corner radius) existed — risk of Carpool and Feed/Auth/Profile screens visually diverging across the two parallel mobile branches.
